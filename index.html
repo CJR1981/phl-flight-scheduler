@@ -232,24 +232,31 @@
     }
     
     .team-selector {
-        padding: 6px 10px;
-        border: 1px solid #cbd5e0;
-        border-radius: 4px;
+        padding: 8px 12px;
+        border: 2px solid #cbd5e0;
+        border-radius: 6px;
         background: white;
-        font-size: 0.9em;
+        font-size: 0.95em;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
+        min-width: 120px;
     }
     
     .team-selector:hover {
         border-color: #667eea;
         background: #f7fafc;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
     }
     
     .team-selector:focus {
         outline: none;
         border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .team-selector option {
+        padding: 8px;
     }
 
     .loading {
@@ -320,6 +327,108 @@
         height: 100%;
         background: linear-gradient(90deg, #28a745 0%, #20c997 50%, #ffc107 80%, #dc3545 100%);
         transition: width 0.3s;
+    }
+    
+    .ai-chat-container {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+    }
+    
+    .ai-info-box {
+        background: white;
+        border-left: 4px solid #667eea;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .ai-info-box ul {
+        color: #495057;
+        font-size: 0.95em;
+    }
+    
+    .chat-messages {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        min-height: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .chat-message {
+        margin-bottom: 15px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .chat-message.user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        margin-left: 20%;
+        text-align: right;
+    }
+    
+    .chat-message.assistant {
+        background: #e9ecef;
+        color: #2a5298;
+        margin-right: 20%;
+    }
+    
+    .chat-message.success {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        color: #155724;
+    }
+    
+    .chat-message.error {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+    }
+    
+    .chat-input-container {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    
+    .chat-input-container textarea {
+        flex: 1;
+        padding: 12px 15px;
+        border: 2px solid #cbd5e0;
+        border-radius: 8px;
+        font-size: 1em;
+        font-family: inherit;
+        resize: none;
+        transition: border-color 0.3s;
+    }
+    
+    .chat-input-container textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .chat-input-container button {
+        white-space: nowrap;
+        height: fit-content;
     }
 
     @media (max-width: 768px) {
@@ -408,6 +517,7 @@
                             <th>Shift</th>
                             <th>Operations</th>
                             <th>Workload</th>
+                            <th>Flights</th>
                             <th>First Flight</th>
                             <th>Last Flight</th>
                         </tr>
@@ -449,6 +559,33 @@
                         </thead>
                         <tbody id="unassignedTableBody"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <div id="aiAssistantSection" style="display: none; margin-top: 40px;">
+                <h2 class="section-title">🤖 AI Schedule Assistant</h2>
+                <div class="ai-chat-container">
+                    <div class="ai-info-box">
+                        <p><strong>Ask me to modify your schedule!</strong> Examples:</p>
+                        <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                            <li>"Move flight 1622 from TM204 to TM205"</li>
+                            <li>"Reassign all flights from TM210 to TM211"</li>
+                            <li>"Balance the workload between teams"</li>
+                            <li>"Show me which teams are overloaded"</li>
+                            <li>"Assign unassigned flight 2213 to TM215"</li>
+                        </ul>
+                    </div>
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <textarea 
+                            id="chatInput" 
+                            placeholder="Ask me to change the schedule... (e.g., 'Move flight 1622 to TM205')"
+                            rows="2"
+                        ></textarea>
+                        <button class="btn-primary" id="sendChatBtn" onclick="sendChatMessage()">
+                            ✨ Send Request
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -528,6 +665,7 @@
                 displayResults(scheduleResult);
                 document.getElementById('loading').classList.remove('active');
                 document.getElementById('results').style.display = 'block';
+                document.getElementById('aiAssistantSection').style.display = 'block';
                 document.getElementById('exportBtn').disabled = false;
             } catch (error) {
                 alert('Error generating schedule: ' + error.message);
@@ -997,6 +1135,7 @@
         result.teamWorkload.forEach(tw => {
             const firstFlight = tw.operations[0];
             const lastFlight = tw.operations[tw.operations.length - 1];
+            const flightNumbers = tw.operations.map(op => op.flight).join(', ');
             const row = `
                 <tr>
                     <td><strong>${tw.team.id}</strong></td>
@@ -1007,12 +1146,37 @@
                             <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
                         </div>
                     </td>
+                    <td style="font-size: 0.85em;">${flightNumbers || '-'}</td>
                     <td>${firstFlight ? firstFlight.time : '-'}</td>
                     <td>${lastFlight ? lastFlight.time : '-'}</td>
                 </tr>
             `;
             teamTableBody.innerHTML += row;
         });
+        
+        // Add OVERNIGHT row if there are overnight assignments
+        const overnightFlights = result.assignments.filter(a => a.team === 'OVERNIGHT');
+        if (overnightFlights.length > 0) {
+            const overnightNumbers = overnightFlights.map(a => a.flight.flight).join(', ');
+            const firstOvernight = overnightFlights[0].flight;
+            const lastOvernight = overnightFlights[overnightFlights.length - 1].flight;
+            const row = `
+                <tr style="background: #fff3cd;">
+                    <td><strong>OVERNIGHT</strong></td>
+                    <td>Previous Day</td>
+                    <td>${overnightFlights.length}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(overnightFlights.length / 6) * 100}%; background: #ffc107;"></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 0.85em;">${overnightNumbers}</td>
+                    <td>${firstOvernight.time}</td>
+                    <td>${lastOvernight.time}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML = row + teamTableBody.innerHTML; // Add at top
+        }
 
         // Display flight assignments with editable team assignments
         const flightTableBody = document.getElementById('flightTableBody');
@@ -1104,9 +1268,11 @@
     function updateTeamWorkloadDisplay() {
         const teamTableBody = document.getElementById('teamTableBody');
         teamTableBody.innerHTML = '';
+        
         scheduleResult.teamWorkload.forEach(tw => {
             const firstFlight = tw.operations[0];
             const lastFlight = tw.operations[tw.operations.length - 1];
+            const flightNumbers = tw.operations.map(op => op.flight).join(', ');
             const row = `
                 <tr>
                     <td><strong>${tw.team.id}</strong></td>
@@ -1117,16 +1283,276 @@
                             <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
                         </div>
                     </td>
+                    <td style="font-size: 0.85em;">${flightNumbers || '-'}</td>
                     <td>${firstFlight ? firstFlight.time : '-'}</td>
                     <td>${lastFlight ? lastFlight.time : '-'}</td>
                 </tr>
             `;
             teamTableBody.innerHTML += row;
         });
+        
+        // Add OVERNIGHT row
+        const overnightFlights = scheduleResult.assignments.filter(a => a.team === 'OVERNIGHT');
+        if (overnightFlights.length > 0) {
+            const overnightNumbers = overnightFlights.map(a => a.flight.flight).join(', ');
+            const firstOvernight = overnightFlights[0].flight;
+            const lastOvernight = overnightFlights[overnightFlights.length - 1].flight;
+            const row = `
+                <tr style="background: #fff3cd;">
+                    <td><strong>OVERNIGHT</strong></td>
+                    <td>Previous Day</td>
+                    <td>${overnightFlights.length}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(overnightFlights.length / 6) * 100}%; background: #ffc107;"></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 0.85em;">${overnightNumbers}</td>
+                    <td>${firstOvernight.time}</td>
+                    <td>${lastOvernight.time}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML = row + teamTableBody.innerHTML;
+        }
     }
     
     // Make updateAssignment globally available
     window.updateAssignment = updateAssignment;
+    
+    // AI Chat Assistant
+    async function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        if (!scheduleResult) {
+            addChatMessage('Please generate a schedule first!', 'error');
+            return;
+        }
+        
+        // Clear input and disable button
+        input.value = '';
+        const sendBtn = document.getElementById('sendChatBtn');
+        sendBtn.disabled = true;
+        sendBtn.textContent = '⏳ Thinking...';
+        
+        // Show user message
+        addChatMessage(message, 'user');
+        
+        try {
+            // Process the request locally using pattern matching
+            const result = await processScheduleRequest(message);
+            
+            if (result.success) {
+                addChatMessage(result.message, 'success');
+                
+                // Apply changes if any
+                if (result.changes && result.changes.length > 0) {
+                    result.changes.forEach(change => {
+                        updateAssignment(change.index, change.newTeam);
+                    });
+                }
+                
+                // Refresh display
+                displayResults(scheduleResult);
+            } else {
+                addChatMessage(result.message, 'assistant');
+            }
+        } catch (error) {
+            addChatMessage('Sorry, I encountered an error: ' + error.message, 'error');
+        }
+        
+        // Re-enable button
+        sendBtn.disabled = false;
+        sendBtn.textContent = '✨ Send Request';
+    }
+    
+    function addChatMessage(text, type) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${type}`;
+        messageDiv.textContent = text;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    async function processScheduleRequest(message) {
+        const lowerMessage = message.toLowerCase();
+        
+        // Pattern 1: Move specific flight to team
+        const movePattern = /move.*flight\s+(\d+).*to\s+(tm\d+|overnight)/i;
+        const moveMatch = message.match(movePattern);
+        
+        if (moveMatch) {
+            const flightNum = moveMatch[1];
+            const targetTeam = moveMatch[2].toUpperCase();
+            
+            const assignmentIndex = scheduleResult.assignments.findIndex(a => 
+                a.flight.flight.includes(flightNum)
+            );
+            
+            if (assignmentIndex === -1) {
+                return {
+                    success: false,
+                    message: `Flight ${flightNum} not found in current assignments. It may be unassigned.`
+                };
+            }
+            
+            const assignment = scheduleResult.assignments[assignmentIndex];
+            const oldTeam = assignment.team;
+            
+            return {
+                success: true,
+                message: `✓ Moved flight ${flightNum} from ${oldTeam} to ${targetTeam}`,
+                changes: [{ index: assignmentIndex, newTeam: targetTeam }]
+            };
+        }
+        
+        // Pattern 2: Show overloaded teams
+        if (lowerMessage.includes('overload') || lowerMessage.includes('too many')) {
+            const overloaded = scheduleResult.teamWorkload
+                .filter(tw => tw.count > 6)
+                .map(tw => `${tw.team.id}: ${tw.count} operations`)
+                .join(', ');
+            
+            if (overloaded) {
+                return {
+                    success: false,
+                    message: `Overloaded teams (>6 ops): ${overloaded}`
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'No teams are currently overloaded (all have ≤6 operations)'
+                };
+            }
+        }
+        
+        // Pattern 3: Show underutilized teams
+        if (lowerMessage.includes('underutilized') || lowerMessage.includes('under')) {
+            const underutilized = scheduleResult.teamWorkload
+                .filter(tw => tw.count < 3 && tw.count > 0)
+                .map(tw => `${tw.team.id}: ${tw.count} operations`)
+                .join(', ');
+            
+            if (underutilized) {
+                return {
+                    success: false,
+                    message: `Underutilized teams (<3 ops): ${underutilized}`
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'All teams have adequate workload (≥3 operations)'
+                };
+            }
+        }
+        
+        // Pattern 4: Balance workload
+        if (lowerMessage.includes('balance')) {
+            // Find most overloaded and least loaded teams
+            const sorted = [...scheduleResult.teamWorkload].sort((a, b) => b.count - a.count);
+            const mostLoaded = sorted[0];
+            const leastLoaded = sorted[sorted.length - 1];
+            
+            if (mostLoaded.count - leastLoaded.count <= 2) {
+                return {
+                    success: false,
+                    message: 'Schedule is already well balanced. Max difference is ≤2 operations.'
+                };
+            }
+            
+            return {
+                success: false,
+                message: `Workload spread: ${mostLoaded.team.id} has ${mostLoaded.count} ops, ${leastLoaded.team.id} has ${leastLoaded.count} ops. Consider manually moving flights between them.`
+            };
+        }
+        
+        // Pattern 5: Reassign all flights from one team to another
+        const reassignPattern = /reassign.*from\s+(tm\d+).*to\s+(tm\d+)/i;
+        const reassignMatch = message.match(reassignPattern);
+        
+        if (reassignMatch) {
+            const fromTeam = reassignMatch[1].toUpperCase();
+            const toTeam = reassignMatch[2].toUpperCase();
+            
+            const changes = [];
+            scheduleResult.assignments.forEach((a, index) => {
+                if (a.team === fromTeam) {
+                    changes.push({ index, newTeam: toTeam });
+                }
+            });
+            
+            if (changes.length === 0) {
+                return {
+                    success: false,
+                    message: `No flights found assigned to ${fromTeam}`
+                };
+            }
+            
+            return {
+                success: true,
+                message: `✓ Reassigned ${changes.length} flights from ${fromTeam} to ${toTeam}`,
+                changes: changes
+            };
+        }
+        
+        // Pattern 6: Show team details
+        const teamPattern = /show.*team\s+(tm\d+|overnight)/i;
+        const teamMatch = message.match(teamPattern);
+        
+        if (teamMatch) {
+            const teamId = teamMatch[1].toUpperCase();
+            const teamWorkload = scheduleResult.teamWorkload.find(tw => tw.team.id === teamId);
+            
+            if (!teamWorkload) {
+                const overnightFlights = scheduleResult.assignments.filter(a => a.team === 'OVERNIGHT');
+                if (teamId === 'OVERNIGHT' && overnightFlights.length > 0) {
+                    const flights = overnightFlights.map(a => 
+                        `${a.flight.flight} (${a.flight.time} to ${a.flight.destination})`
+                    ).join(', ');
+                    return {
+                        success: false,
+                        message: `OVERNIGHT: ${overnightFlights.length} flights - ${flights}`
+                    };
+                }
+                return {
+                    success: false,
+                    message: `Team ${teamId} not found`
+                };
+            }
+            
+            const flights = teamWorkload.operations.map(op => 
+                `${op.flight} (${op.time} to ${op.destination})`
+            ).join(', ');
+            
+            return {
+                success: false,
+                message: `${teamId}: ${teamWorkload.count} operations - ${flights}`
+            };
+        }
+        
+        // Default response
+        return {
+            success: false,
+            message: "I can help you with:\n• Move flight [number] to [team]\n• Show team [team]\n• Show overloaded/underutilized teams\n• Reassign flights from [team] to [team]\n• Balance workload"
+        };
+    }
+    
+    // Allow Enter key to send message
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                }
+            });
+        }
+    });
+    
+    window.sendChatMessage = sendChatMessage;
 
     function exportToExcel() {
         if (!scheduleResult) return;
