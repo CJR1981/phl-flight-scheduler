@@ -230,6 +230,27 @@
         background: #fff3cd;
         color: #856404;
     }
+    
+    .team-selector {
+        padding: 6px 10px;
+        border: 1px solid #cbd5e0;
+        border-radius: 4px;
+        background: white;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .team-selector:hover {
+        border-color: #667eea;
+        background: #f7fafc;
+    }
+    
+    .team-selector:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
 
     .loading {
         display: none;
@@ -549,23 +570,26 @@
 
         console.log('Starting phase-based assignment...');
 
-        // **PHASE 0: Overnight teams (TM110, TM111) for early morning departures (05:00-08:00)**
-        const overnightTeams = teams.filter(t => t.id === 'TM110' || t.id === 'TM111');
-        const earlyMorningFlights = flights.filter(f => 
-            f.timeMinutes >= 300 && f.timeMinutes < 480 // 5:00 AM to 8:00 AM
-        );
+        // **PHASE 0: Mark first 2-3 domestic flights as "Overnight Serviced"**
+        // These are serviced by previous day's overnight teams (not scheduled today)
+        const veryEarlyDomestic = flights
+            .filter(f => f.type === 'Domestic' && f.timeMinutes < 420) // Before 7am
+            .slice(0, 3); // Take first 3
         
-        console.log(`Phase 0 - Overnight Teams (TM110, TM111): ${earlyMorningFlights.length} early morning flights`);
-        console.log(`Overnight teams available: ${overnightTeams.map(t => t.id).join(', ')}`);
-        
-        // Assign flights to overnight teams - at least 2 each, up to 4 each
-        if (overnightTeams.length > 0) {
-            assignFlightsToSpecificTeams(earlyMorningFlights, overnightTeams, assignments, unassigned, teamWorkload, 'overnight_early', 2, 4);
-        }
+        console.log(`Phase 0 - Overnight Serviced: ${veryEarlyDomestic.length} flights`);
+        veryEarlyDomestic.forEach(flight => {
+            assignments.push({
+                flight: flight,
+                team: 'OVERNIGHT',
+                phase: 'overnight_serviced'
+            });
+            console.log(`✓ ${flight.flight} (${flight.time}) → OVERNIGHT (previous day team)`);
+        });
 
-        // Phase 1: Early domestic flights (before 07:00) - using early shift teams
+        // Phase 1: Early domestic flights (before 07:00) - excluding overnight serviced
         const earlyDomestic = flights.filter(f => 
-            f.type === 'Domestic' && f.timeMinutes < 420 &&
+            f.type === 'Domestic' && 
+            f.timeMinutes < 420 &&
             !assignments.some(a => a.flight === f) // Not already assigned
         );
         console.log(`Phase 1 - Early Domestic: ${earlyDomestic.length} flights`);
@@ -609,18 +633,14 @@
 
         console.log(`=== Schedule Complete ===`);
         console.log(`Assigned: ${assignments.length}, Unassigned: ${unassigned.length}`);
-        
-        // Log overnight team workload
-        overnightTeams.forEach(team => {
-            const workload = teamWorkload[team.id];
-            console.log(`${team.id}: ${workload.count} operations`);
-        });
+        console.log(`Overnight serviced: ${veryEarlyDomestic.length} flights`);
 
         return {
             assignments,
             unassigned,
             teamWorkload: Object.values(teamWorkload),
-            stats: calculateStats(assignments, unassigned, teams)
+            stats: calculateStats(assignments, unassigned, teams),
+            overnightCount: veryEarlyDomestic.length
         };
     }
 
@@ -741,73 +761,6 @@
         return processed;
     }
 
-    function assignFlightsToSpecificTeams(flights, teams, assignments, unassigned, teamWorkload, phase, minPerTeam = 2, maxPerTeam = 6) {
-        console.log(`\n--- Assigning ${flights.length} flights to specific teams: ${teams.map(t => t.id).join(', ')} (min: ${minPerTeam}, max: ${maxPerTeam}) ---`);
-        
-        if (flights.length === 0 || teams.length === 0) {
-            console.log('No flights or teams available');
-            return;
-        }
-        
-        // Sort flights by time
-        const sortedFlights = [...flights].sort((a, b) => a.timeMinutes - b.timeMinutes);
-        
-        // First pass: ensure each team gets minimum flights
-        let teamIndex = 0;
-        for (let flight of sortedFlights) {
-            // Find a team that hasn't reached minimum yet
-            let assignedToMin = false;
-            for (let i = 0; i < teams.length; i++) {
-                const team = teams[i];
-                const workload = teamWorkload[team.id];
-                
-                if (workload.count < minPerTeam && canAssignFlight(team, flight, workload)) {
-                    assignments.push({
-                        flight: flight,
-                        team: team.id,
-                        phase: phase
-                    });
-                    workload.operations.push(flight);
-                    workload.count++;
-                    assignedToMin = true;
-                    console.log(`✓ ${flight.flight} (${flight.time}) → ${team.id} [min target: ${workload.count}/${minPerTeam}]`);
-                    break;
-                }
-            }
-            
-            if (assignedToMin) {
-                continue; // Move to next flight
-            }
-            
-            // Second pass: distribute remaining flights up to max
-            let assigned = false;
-            for (let team of teams) {
-                const workload = teamWorkload[team.id];
-                
-                if (workload.count < maxPerTeam && canAssignFlight(team, flight, workload)) {
-                    assignments.push({
-                        flight: flight,
-                        team: team.id,
-                        phase: phase
-                    });
-                    workload.operations.push(flight);
-                    workload.count++;
-                    assigned = true;
-                    console.log(`✓ ${flight.flight} (${flight.time}) → ${team.id} [${workload.count}/${maxPerTeam}]`);
-                    break;
-                }
-            }
-            
-            if (!assigned) {
-                // Flight couldn't be assigned to these specific teams
-                // Don't add to unassigned - let it be picked up by later phases
-                console.log(`○ ${flight.flight} (${flight.time}) - will try in later phases`);
-            }
-        }
-        
-        console.log(`Phase complete: ${teams.map(t => `${t.id}=${teamWorkload[t.id].count}`).join(', ')}`);
-    }
-
     function assignFlights(flights, teams, assignments, unassigned, teamWorkload, phase) {
         console.log(`\n--- Assigning ${flights.length} flights in phase: ${phase} ---`);
         
@@ -873,34 +826,6 @@
     }
 
     function canAssignFlight(team, flight, workload) {
-        // Special handling for overnight teams (TM110, TM111)
-        // They work 23:00-05:00 (2300-0500), so they're ready for early morning departures
-        const isOvernightTeam = team.id === 'TM110' || team.id === 'TM111';
-        
-        if (isOvernightTeam) {
-            // Overnight teams can service flights from 05:00-08:00
-            if (flight.timeMinutes < 300 || flight.timeMinutes > 480) {
-                return false; // Only 5am-8am flights
-            }
-            
-            // Check workload limit for overnight teams
-            if (workload.count >= 4) {
-                return false;
-            }
-            
-            // Check timing between operations (30 min minimum)
-            if (workload.operations.length > 0) {
-                const lastOp = workload.operations[workload.operations.length - 1];
-                const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
-                if (timeSinceLastOp < 30) {
-                    return false;
-                }
-            }
-            
-            return true;
-        }
-        
-        // Regular team logic
         // Check if team has started (allow 15 minutes before shift for early prep)
         const teamReadyTime = team.startMinutes - 15;
         if (flight.timeMinutes < teamReadyTime) {
@@ -1089,17 +1014,30 @@
             teamTableBody.innerHTML += row;
         });
 
-        // Display flight assignments
+        // Display flight assignments with editable team assignments
         const flightTableBody = document.getElementById('flightTableBody');
         flightTableBody.innerHTML = '';
-        result.assignments.forEach(a => {
+        
+        // Get list of all teams for dropdown
+        const allTeams = [...new Set(result.teamWorkload.map(tw => tw.team.id))].sort();
+        allTeams.unshift('OVERNIGHT'); // Add overnight option
+        
+        result.assignments.forEach((a, index) => {
+            const teamDropdown = allTeams.map(teamId => 
+                `<option value="${teamId}" ${teamId === a.team ? 'selected' : ''}>${teamId}</option>`
+            ).join('');
+            
             const row = `
-                <tr>
+                <tr data-assignment-index="${index}">
                     <td><strong>${a.flight.flight}</strong></td>
                     <td>${a.flight.destination}</td>
                     <td>${a.flight.time}</td>
                     <td><span class="status-badge status-${a.flight.type.toLowerCase()}">${a.flight.type}</span></td>
-                    <td>${a.team}</td>
+                    <td>
+                        <select class="team-selector" onchange="updateAssignment(${index}, this.value)">
+                            ${teamDropdown}
+                        </select>
+                    </td>
                     <td>${a.flight.gate}</td>
                 </tr>
             `;
@@ -1131,6 +1069,64 @@
 
     // Export to Excel
     document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+    
+    // Handle assignment changes
+    function updateAssignment(index, newTeam) {
+        if (!scheduleResult) return;
+        
+        const assignment = scheduleResult.assignments[index];
+        const oldTeam = assignment.team;
+        
+        // Update the assignment
+        assignment.team = newTeam;
+        
+        // Recalculate team workloads
+        scheduleResult.teamWorkload.forEach(tw => {
+            // Remove from old team
+            if (tw.team.id === oldTeam) {
+                tw.operations = tw.operations.filter(op => op !== assignment.flight);
+                tw.count = tw.operations.length;
+            }
+            // Add to new team (only if it's not OVERNIGHT)
+            if (tw.team.id === newTeam) {
+                tw.operations.push(assignment.flight);
+                tw.operations.sort((a, b) => a.timeMinutes - b.timeMinutes);
+                tw.count = tw.operations.length;
+            }
+        });
+        
+        // Refresh the team workload display
+        updateTeamWorkloadDisplay();
+        
+        console.log(`Updated: ${assignment.flight.flight} from ${oldTeam} to ${newTeam}`);
+    }
+    
+    function updateTeamWorkloadDisplay() {
+        const teamTableBody = document.getElementById('teamTableBody');
+        teamTableBody.innerHTML = '';
+        scheduleResult.teamWorkload.forEach(tw => {
+            const firstFlight = tw.operations[0];
+            const lastFlight = tw.operations[tw.operations.length - 1];
+            const row = `
+                <tr>
+                    <td><strong>${tw.team.id}</strong></td>
+                    <td>${tw.team.shift}</td>
+                    <td>${tw.count}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
+                        </div>
+                    </td>
+                    <td>${firstFlight ? firstFlight.time : '-'}</td>
+                    <td>${lastFlight ? lastFlight.time : '-'}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML += row;
+        });
+    }
+    
+    // Make updateAssignment globally available
+    window.updateAssignment = updateAssignment;
 
     function exportToExcel() {
         if (!scheduleResult) return;
