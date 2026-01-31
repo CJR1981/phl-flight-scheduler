@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,427 +13,430 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
 
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
+    .header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
 
+    .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+    }
+
+    .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+
+    .content {
+        padding: 30px;
+    }
+
+    .upload-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .upload-section h2 {
+        color: #2a5298;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+
+    .file-upload-group {
+        margin-bottom: 20px;
+    }
+
+    .file-upload-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #495057;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px dashed #cbd5e0;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .file-input-wrapper input[type="file"]:hover {
+        border-color: #667eea;
+        background: #f7fafc;
+    }
+
+    .file-status {
+        margin-top: 8px;
+        font-size: 0.9em;
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        padding: 14px 28px;
+        font-size: 1em;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+
+    .results-section {
+        margin-top: 30px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+    .stat-card h3 {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-card .value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #2a5298;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th {
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    tr:hover {
+        background: #f8f9fa;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: 600;
+    }
+
+    .status-domestic {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-international {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .team-selector {
+        padding: 8px 12px;
+        border: 2px solid #cbd5e0;
+        border-radius: 6px;
+        background: white;
+        font-size: 0.95em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 120px;
+    }
+    
+    .team-selector:hover {
+        border-color: #667eea;
+        background: #f7fafc;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    }
+    
+    .team-selector:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .team-selector option {
+        padding: 8px;
+    }
+    
+    .team-detail-card {
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .team-detail-header {
+        background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .team-detail-header h3 {
+        margin: 0;
+        font-size: 1.5em;
+    }
+    
+    .team-detail-info {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 0.95em;
+    }
+    
+    .team-detail-info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .team-detail-info-item label {
+        opacity: 0.8;
+        font-size: 0.85em;
+        margin-bottom: 2px;
+    }
+    
+    .team-detail-info-item value {
+        font-weight: 600;
+    }
+    
+    .team-flights-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .team-flights-table th {
+        background: #f8f9fa;
+        color: #495057;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .team-flights-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .team-flights-table tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .team-flights-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .flight-detail-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        font-weight: 600;
+        margin-right: 5px;
+    }
+    
+    .overnight-card .team-detail-header {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: #000;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 40px;
+    }
+
+    .loading.active {
+        display: block;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .alert-info {
+        background: #d1ecf1;
+        border-left: 4px solid #0c5460;
+        color: #0c5460;
+    }
+
+    .alert-warning {
+        background: #fff3cd;
+        border-left: 4px solid #856404;
+        color: #856404;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border-left: 4px solid #155724;
+        color: #155724;
+    }
+
+    .section-title {
+        font-size: 1.3em;
+        color: #2a5298;
+        margin: 30px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .workload-bar {
+        height: 20px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .workload-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745 0%, #20c997 50%, #ffc107 80%, #dc3545 100%);
+        transition: width 0.3s;
+    }
+
+    @media (max-width: 768px) {
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
         }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .upload-section {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .upload-section h2 {
-            color: #2a5298;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .file-upload-group {
-            margin-bottom: 20px;
-        }
-
-        .file-upload-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #495057;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px dashed #cbd5e0;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .file-input-wrapper input[type="file"]:hover {
-            border-color: #667eea;
-            background: #f7fafc;
-        }
-
-        .file-status {
-            margin-top: 8px;
-            font-size: 0.9em;
-            color: #28a745;
-            font-weight: 500;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 14px 28px;
-            font-size: 1em;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-        }
-
-        .btn-success:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        }
-
-        .results-section {
-            margin-top: 30px;
-        }
-
+        
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .stat-card h3 {
-            font-size: 0.9em;
-            color: #6c757d;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-card .value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #2a5298;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th {
-            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .status-domestic {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status-international {
-            background: #fff3cd;
-            color: #856404;
+            grid-template-columns: 1fr;
         }
         
-        .team-selector {
-            padding: 8px 12px;
-            border: 2px solid #cbd5e0;
-            border-radius: 6px;
-            background: white;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 120px;
-        }
-        
-        .team-selector:hover {
-            border-color: #667eea;
-            background: #f7fafc;
-            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
-        }
-        
-        .team-selector:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-        
-        .team-selector option {
-            padding: 8px;
-        }
-        
-        .team-detail-card {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .team-detail-header {
-            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .team-detail-header h3 {
-            margin: 0;
-            font-size: 1.5em;
-        }
-        
-        .team-detail-info {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            font-size: 0.95em;
-        }
-        
-        .team-detail-info-item {
-            display: flex;
+        .button-group {
             flex-direction: column;
         }
         
-        .team-detail-info-item label {
-            opacity: 0.8;
-            font-size: 0.85em;
-            margin-bottom: 2px;
-        }
-        
-        .team-detail-info-item value {
-            font-weight: 600;
-        }
-        
-        .team-flights-table {
+        button {
             width: 100%;
-            border-collapse: collapse;
+            justify-content: center;
         }
-        
-        .team-flights-table th {
-            background: #f8f9fa;
-            color: #495057;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #e9ecef;
-        }
-        
-        .team-flights-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .team-flights-table tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .team-flights-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .flight-detail-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-right: 5px;
-        }
-        
-        .overnight-card .team-detail-header {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-            color: #000;
-        }
+    }
+</style>
+```
 
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            border-left: 4px solid #0c5460;
-            color: #0c5460;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            border-left: 4px solid #856404;
-            color: #856404;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            border-left: 4px solid #155724;
-            color: #155724;
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            color: #2a5298;
-            margin: 30px 0 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .workload-bar {
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .workload-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #28a745 0%, #20c997 50%, #ffc107 80%, #dc3545 100%);
-            transition: width 0.3s;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -441,1450 +445,1937 @@
             <p>Philadelphia International Airport - Catering Operations Scheduler</p>
         </div>
 
-        <div class="content">
-            <div class="upload-section">
-                <h2>📁 Upload Schedule Files</h2>
-                
-                <div class="file-upload-group">
-                    <label for="dayOfWeek">Select Day of Week to Schedule</label>
-                    <select id="dayOfWeek" style="width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 6px; font-size: 1em; background: white;">
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday" selected>Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
+```
+    <div class="content">
+        <div class="upload-section">
+            <h2>📁 Upload Schedule Files</h2>
+            
+            <div class="file-upload-group">
+                <label for="dayOfWeek">Select Day of Week to Schedule</label>
+                <select id="dayOfWeek" style="width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 6px; font-size: 1em; background: white;">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday" selected>Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
+            
+            <div class="file-upload-group">
+                <label for="ftAgents">Full-Time Agents Schedule (CSV)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="ftAgents" accept=".csv" />
                 </div>
-                
-                <div class="file-upload-group">
-                    <label for="ftAgents">Full-Time Agents Schedule (CSV)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="ftAgents" accept=".csv" />
-                    </div>
-                    <div class="file-status" id="ftStatus"></div>
-                </div>
-
-                <div class="file-upload-group">
-                    <label for="ptAgents">Part-Time Agents Schedule (CSV)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="ptAgents" accept=".csv" />
-                    </div>
-                    <div class="file-status" id="ptStatus"></div>
-                </div>
-
-                <div class="file-upload-group">
-                    <label for="flights">Daily Flight Schedule (CSV)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="flights" accept=".csv" />
-                    </div>
-                    <div class="file-status" id="flightStatus"></div>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn-primary" id="generateBtn" disabled>
-                        🚀 Generate Schedule
-                    </button>
-                    <button class="btn-success" id="exportBtn" disabled>
-                        📊 Export to Excel
-                    </button>
-                </div>
+                <div class="file-status" id="ftStatus"></div>
             </div>
 
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Generating optimized schedule...</p>
+            <div class="file-upload-group">
+                <label for="ptAgents">Part-Time Agents Schedule (CSV)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="ptAgents" accept=".csv" />
+                </div>
+                <div class="file-status" id="ptStatus"></div>
             </div>
 
-            <div class="results-section" id="results" style="display: none;">
-                <h2 class="section-title">📊 Schedule Summary</h2>
-                <div class="stats-grid" id="statsGrid"></div>
-
-                <h2 class="section-title">👥 Team Assignments Summary</h2>
-                <div class="table-container">
-                    <table id="teamTable">
-                        <thead>
-                            <tr>
-                                <th>Team</th>
-                                <th>Shift</th>
-                                <th>Operations</th>
-                                <th>Workload</th>
-                                <th>Flights</th>
-                                <th>First Flight</th>
-                                <th>Last Flight</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teamTableBody"></tbody>
-                    </table>
+            <div class="file-upload-group">
+                <label for="flights">Daily Flight Schedule (CSV)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="flights" accept=".csv" />
                 </div>
+                <div class="file-status" id="flightStatus"></div>
+            </div>
 
-                <h2 class="section-title">📋 Detailed Team Assignments (Grouped by Team)</h2>
-                <div class="alert alert-info" style="margin-bottom: 20px;">
-                    <strong>Current Buffer Settings:</strong><br>
-                    • Standard Mode: 30 min between domestic flights, 50-75 min for international<br>
-                    • Flexible Mode: 25 min between domestic, 50-75 min for international<br>
-                    • Final Sweep: 20 min minimum gap (all flight types)<br>
-                    • Team availability: 15-30 min before shift start (varies by phase)<br>
-                    • Overtime allowance: 2-4 hours depending on coverage needs
-                </div>
-                <div id="teamDetailedGroups"></div>
+            <div class="button-group">
+                <button class="btn-primary" id="generateBtn" disabled>
+                    🚀 Generate Schedule
+                </button>
+                <button class="btn-success" id="exportBtn" disabled>
+                    📊 Export to Excel
+                </button>
+            </div>
+        </div>
 
-                <h2 class="section-title">🛫 All Flight Assignments (Chronological)</h2>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating optimized schedule...</p>
+        </div>
+
+        <div class="results-section" id="results" style="display: none;">
+            <h2 class="section-title">📊 Schedule Summary</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <h2 class="section-title">👥 Team Assignments Summary</h2>
+            <div class="table-container">
+                <table id="teamTable">
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Shift</th>
+                            <th>Operations</th>
+                            <th>Workload</th>
+                            <th>Flights</th>
+                            <th>First Flight</th>
+                            <th>Last Flight</th>
+                            <th>Finish Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teamTableBody"></tbody>
+                </table>
+            </div>
+
+            <h2 class="section-title">📋 Detailed Team Assignments (Grouped by Team)</h2>
+            <div class="alert alert-info" style="margin-bottom: 20px;">
+                <strong>Turn Flight Operations (NO Overtime Allowed):</strong><br>
+                <strong>🚚 Truck Capacity: Max 3 domestic flights OR 1 international flight per load</strong><br><br>
+                <strong>Flight Types:</strong><br>
+                • <strong>Short Turn (≤3 hrs ground time):</strong> Same team strips (15 min) + loads - Team arrives at STA<br>
+                • <strong>Long Turn (>3 hrs ground time):</strong> Can split strip/load if improves coverage<br>
+                • <strong>Overnight:</strong> Plane already here - service up to 3 hours before STD<br>
+                • <strong>Terminator:</strong> Strip on arrival (flexible timing) - becomes overnight for next day<br><br>
+                <strong>Buffer Requirements:</strong><br>
+                • <strong>Domestic → Domestic:</strong> 40 min (service time - same truck if space)<br>
+                • <strong>Domestic → International:</strong> 135 min (return + reload dedicated + drive)<br>
+                • <strong>International → Domestic:</strong> 130 min (return + reload domestic + drive)<br>
+                • <strong>International → International:</strong> 155 min (ONLY 1 intl per truck - full cycle)<br><br>
+                <strong>Shift Constraints:</strong><br>
+                • <strong>NO OVERTIME:</strong> Last flight must complete service + return BEFORE shift end<br>
+                • <strong>First flight timing:</strong> Within 1 hour of shift start<br>
+                • <strong>Team prep time:</strong> 60 min after shift start for initial loading and drive<br><br>
+                <strong>Workload Targets:</strong><br>
+                • <strong>Part-Time:</strong> 4 operations (standard), 5 (flexible), 6 (final sweep)<br>
+                • <strong>Full-Time:</strong> 6 operations (standard), 7 (flexible), 8 (final sweep)<br>
+                • <strong>Priority:</strong> 100% coverage - Short Turns first, then Overnights, then Terminators
+            </div>
+            <div id="teamDetailedGroups"></div>
+
+            <h2 class="section-title">🛫 All Flight Assignments (Chronological)</h2>
+            <div class="table-container">
+                <table id="flightTable">
+                    <thead>
+                        <tr>
+                            <th>Flight</th>
+                            <th>Destination</th>
+                            <th>Departure Time</th>
+                            <th>Type</th>
+                            <th>Assigned Team</th>
+                            <th>Gate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flightTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="unassignedSection" style="display: none;">
+                <h2 class="section-title">⚠️ Unassigned Flights</h2>
+                <div class="alert alert-warning" id="unassignedAlert"></div>
                 <div class="table-container">
-                    <table id="flightTable">
+                    <table id="unassignedTable">
                         <thead>
                             <tr>
                                 <th>Flight</th>
-                                <th>Destination</th>
-                                <th>Departure Time</th>
+                                <th>Origin</th>
+                                <th>Time</th>
                                 <th>Type</th>
-                                <th>Assigned Team</th>
-                                <th>Gate</th>
+                                <th>Reason</th>
                             </tr>
                         </thead>
-                        <tbody id="flightTableBody"></tbody>
+                        <tbody id="unassignedTableBody"></tbody>
                     </table>
-                </div>
-
-                <div id="unassignedSection" style="display: none;">
-                    <h2 class="section-title">⚠️ Unassigned Flights</h2>
-                    <div class="alert alert-warning" id="unassignedAlert"></div>
-                    <div class="table-container">
-                        <table id="unassignedTable">
-                            <thead>
-                                <tr>
-                                    <th>Flight</th>
-                                    <th>Origin</th>
-                                    <th>Time</th>
-                                    <th>Type</th>
-                                    <th>Reason</th>
-                                </tr>
-                            </thead>
-                            <tbody id="unassignedTableBody"></tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Global data storage
-        let ftAgentsData = null;
-        let ptAgentsData = null;
-        let flightsData = null;
-        let scheduleResult = null;
+<script>
+    // Global data storage
+    let ftAgentsData = null;
+    let ptAgentsData = null;
+    let flightsData = null;
+    let scheduleResult = null;
 
-        // File upload handlers
-        document.getElementById('ftAgents').addEventListener('change', (e) => handleFileUpload(e, 'ft'));
-        document.getElementById('ptAgents').addEventListener('change', (e) => handleFileUpload(e, 'pt'));
-        document.getElementById('flights').addEventListener('change', (e) => handleFileUpload(e, 'flights'));
+    // File upload handlers
+    document.getElementById('ftAgents').addEventListener('change', (e) => handleFileUpload(e, 'ft'));
+    document.getElementById('ptAgents').addEventListener('change', (e) => handleFileUpload(e, 'pt'));
+    document.getElementById('flights').addEventListener('change', (e) => handleFileUpload(e, 'flights'));
 
-        function handleFileUpload(event, type) {
-            const file = event.target.files[0];
-            if (!file) return;
+    function handleFileUpload(event, type) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target.result;
-                const data = parseCSV(text);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            const data = parseCSV(text);
+            
+            if (type === 'ft') {
+                ftAgentsData = data;
+                document.getElementById('ftStatus').textContent = `✓ Loaded ${data.length} full-time agents`;
+            } else if (type === 'pt') {
+                ptAgentsData = data;
+                document.getElementById('ptStatus').textContent = `✓ Loaded ${data.length} part-time agents`;
+            } else if (type === 'flights') {
+                flightsData = data;
+                document.getElementById('flightStatus').textContent = `✓ Loaded ${data.length} flights`;
+            }
+
+            checkReadyToGenerate();
+        };
+        reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        const data = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            const row = {};
+            headers.forEach((header, index) => {
+                row[header] = values[index] ? values[index].trim() : '';
+            });
+            data.push(row);
+        }
+
+        return data;
+    }
+
+    function checkReadyToGenerate() {
+        const ready = ftAgentsData && ptAgentsData && flightsData;
+        document.getElementById('generateBtn').disabled = !ready;
+    }
+
+    // Schedule generation
+    document.getElementById('generateBtn').addEventListener('click', generateSchedule);
+
+    function generateSchedule() {
+        document.getElementById('loading').classList.add('active');
+        document.getElementById('results').style.display = 'none';
+
+        // Simulate processing time for better UX
+        setTimeout(() => {
+            try {
+                scheduleResult = createSchedule();
+                displayResults(scheduleResult);
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('exportBtn').disabled = false;
+            } catch (error) {
+                alert('Error generating schedule: ' + error.message);
+                document.getElementById('loading').classList.remove('active');
+            }
+        }, 1000);
+    }
+
+    function createSchedule() {
+        console.log('=== Starting Schedule Generation ===');
+        
+        // Get selected day of week
+        const dayOfWeek = document.getElementById('dayOfWeek').value;
+        console.log(`Scheduling for: ${dayOfWeek}`);
+        
+        const teams = extractTeams(ftAgentsData, ptAgentsData, dayOfWeek);
+        console.log(`Teams extracted: ${teams.length}`);
+        
+        if (teams.length === 0) {
+            throw new Error(`No teams found for ${dayOfWeek}. Check that your agent CSV files have ${dayOfWeek} data.`);
+        }
+        
+        // Log team shift distribution
+        const shiftDistribution = {};
+        teams.forEach(team => {
+            const hour = Math.floor(team.startMinutes / 60);
+            shiftDistribution[hour] = (shiftDistribution[hour] || 0) + 1;
+        });
+        console.log('Team shift distribution:', shiftDistribution);
+        
+        const flightData = processFlights(flightsData);
+        const flights = flightData.departures;
+        const terminators = flightData.terminators;
+        
+        console.log(`Departures processed: ${flights.length}`);
+        console.log(`Terminators processed: ${terminators.length}`);
+        
+        if (flights.length === 0 && terminators.length === 0) {
+            throw new Error('No valid flights found. Check that your flight CSV has departure times.');
+        }
+
+        // Analyze flight timing distribution
+        const flightsByType = {
+            Overnight: flights.filter(f => f.operationType === 'Overnight').length,
+            ShortTurn: flights.filter(f => f.operationType === 'ShortTurn').length,
+            LongTurn: flights.filter(f => f.operationType === 'LongTurn').length,
+            Terminator: terminators.length
+        };
+        console.log('Flight types:', flightsByType);
+
+        // Phase-based assignment
+        const assignments = [];
+        const unassigned = [];
+        const teamWorkload = {};
+
+        teams.forEach(team => {
+            teamWorkload[team.id] = {
+                team: team,
+                operations: [],
+                count: 0,
+                truckLoad: [] // Track current truck load (max 3 domestic or 1 intl)
+            };
+        });
+
+        console.log('Starting phase-based assignment...');
+
+        // **PHASE 1: Early Short Turns (STD < 07:00) - HIGHEST PRIORITY**
+        const earlyShortTurns = flights.filter(f => 
+            f.operationType === 'ShortTurn' && 
+            f.timeMinutes < 420 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 1 - Early Short Turns: ${earlyShortTurns.length} flights`);
+        assignFlightsFlexible(earlyShortTurns, teams, assignments, unassigned, teamWorkload, 'early_short_turns');
+
+        // **PHASE 2: Early Overnight domestic (before 07:00)**
+        const earlyOvernights = flights.filter(f => 
+            f.operationType === 'Overnight' &&
+            f.type === 'Domestic' && 
+            f.timeMinutes < 420 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 2 - Early Overnights: ${earlyOvernights.length} flights`);
+        assignFlightsFlexible(earlyOvernights, teams, assignments, unassigned, teamWorkload, 'early_overnights');
+
+        // **PHASE 3: Morning international bank (07:00-10:00)**
+        const morningIntl = flights.filter(f => 
+            (f.type === 'International' || f.type === 'Precleared') && 
+            f.timeMinutes >= 420 && f.timeMinutes < 600 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 3 - Morning International: ${morningIntl.length} flights`);
+        assignFlightsFlexible(morningIntl, teams, assignments, unassigned, teamWorkload, 'morning_intl');
+
+        // **PHASE 4: Mid-day Short Turns (07:00-18:00)**
+        const middayShortTurns = flights.filter(f => 
+            f.operationType === 'ShortTurn' &&
+            f.timeMinutes >= 420 && f.timeMinutes < 1080 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 4 - Midday Short Turns: ${middayShortTurns.length} flights`);
+        assignFlightsFlexible(middayShortTurns, teams, assignments, unassigned, teamWorkload, 'midday_short_turns');
+
+        // **PHASE 5: Mid-day Overnight/Long Turn domestic (07:00-18:00)**
+        const middayOther = flights.filter(f => 
+            (f.operationType === 'Overnight' || f.operationType === 'LongTurn') &&
+            f.type === 'Domestic' && 
+            f.timeMinutes >= 420 && f.timeMinutes < 1080 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 5 - Midday Overnight/LongTurn: ${middayOther.length} flights`);
+        assignFlightsFlexible(middayOther, teams, assignments, unassigned, teamWorkload, 'midday_other');
+
+        // **PHASE 6: Evening international bank (18:00-22:00)**
+        const eveningIntl = flights.filter(f => 
+            (f.type === 'International' || f.type === 'Precleared') && 
+            f.timeMinutes >= 1080 && f.timeMinutes < 1320 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 6 - Evening International: ${eveningIntl.length} flights`);
+        assignFlightsFlexible(eveningIntl, teams, assignments, unassigned, teamWorkload, 'evening_intl');
+
+        // **PHASE 7: Late Short Turns (after 18:00)**
+        const lateShortTurns = flights.filter(f => 
+            f.operationType === 'ShortTurn' &&
+            f.timeMinutes >= 1080 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 7 - Late Short Turns: ${lateShortTurns.length} flights`);
+        assignFlightsFlexible(lateShortTurns, teams, assignments, unassigned, teamWorkload, 'late_short_turns');
+
+        // **PHASE 8: Late Overnight/Long Turn (after 18:00)**
+        const lateOther = flights.filter(f => 
+            (f.operationType === 'Overnight' || f.operationType === 'LongTurn') &&
+            f.timeMinutes >= 1080 &&
+            !assignments.some(a => a.flight === f)
+        );
+        console.log(`Phase 8 - Late Overnight/LongTurn: ${lateOther.length} flights`);
+        assignFlightsFlexible(lateOther, teams, assignments, unassigned, teamWorkload, 'late_other');
+
+        // **PHASE 9: Terminators (flexible timing - optimize for coverage)**
+        console.log(`Phase 9 - Terminators: ${terminators.length} flights`);
+        assignTerminators(terminators, teams, assignments, unassigned, teamWorkload, 'terminators');
+
+        // **PHASE 10: Final sweep - try to assign remaining with relaxed constraints**
+        const stillUnassigned = flights.filter(f => 
+            !assignments.some(a => a.flight === f)
+        );
+        if (stillUnassigned.length > 0) {
+            console.log(`Phase 10 - Final Sweep: ${stillUnassigned.length} flights remaining`);
+            assignFlightsVeryFlexible(stillUnassigned, teams, assignments, unassigned, teamWorkload, 'final_sweep');
+        }
+
+        console.log(`=== Schedule Complete ===`);
+        console.log(`Assigned: ${assignments.length}, Unassigned: ${unassigned.length}`);
+        console.log(`Coverage: ${Math.round((assignments.length / (flights.length + terminators.length)) * 100)}%`);
+
+        // Check for idle teams
+        const idleTeams = Object.values(teamWorkload).filter(tw => tw.count === 0);
+        if (idleTeams.length > 0) {
+            console.log(`\n⚠️ WARNING: ${idleTeams.length} IDLE TEAMS:`);
+            idleTeams.forEach(tw => {
+                console.log(`  ${tw.team.id} (${tw.team.shift}) - NO FLIGHTS ASSIGNED`);
+            });
+        }
+
+        // Analyze coverage gaps
+        const unassignedByTime = {};
+        unassigned.forEach(u => {
+            const hour = Math.floor(u.flight.timeMinutes / 60);
+            if (!unassignedByTime[hour]) unassignedByTime[hour] = [];
+            unassignedByTime[hour].push(u.flight.flight);
+        });
+        if (Object.keys(unassignedByTime).length > 0) {
+            console.log('Coverage gaps by hour:', unassignedByTime);
+        }
+
+        return {
+            assignments,
+            unassigned,
+            teamWorkload: Object.values(teamWorkload),
+            stats: calculateStats(assignments, unassigned, flights, terminators, teams),
+            dayOfWeek: dayOfWeek,
+            coverageGaps: unassignedByTime,
+            idleTeams: idleTeams.map(tw => tw.team.id)
+        };
+    }
+    
+    function assignTerminators(terminators, teams, assignments, unassigned, teamWorkload, phase) {
+        console.log(`\n--- Assigning ${terminators.length} terminator strips ---`);
+        
+        // Sort terminators by arrival time
+        const sortedTerminators = [...terminators].sort((a, b) => a.timeMinutes - b.timeMinutes);
+        
+        sortedTerminators.forEach((terminator, index) => {
+            let assigned = false;
+            let bestTeam = null;
+            let bestScore = -Infinity;
+
+            // Find best team for this terminator
+            // Prefer teams that are returning to unit (completed operations)
+            for (let team of teams) {
+                const workload = teamWorkload[team.id];
                 
-                if (type === 'ft') {
-                    ftAgentsData = data;
-                    document.getElementById('ftStatus').textContent = `✓ Loaded ${data.length} full-time agents`;
-                } else if (type === 'pt') {
-                    ptAgentsData = data;
-                    document.getElementById('ptStatus').textContent = `✓ Loaded ${data.length} part-time agents`;
-                } else if (type === 'flights') {
-                    flightsData = data;
-                    document.getElementById('flightStatus').textContent = `✓ Loaded ${data.length} flights`;
-                }
-
-                checkReadyToGenerate();
-            };
-            reader.readAsText(file);
-        }
-
-        function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',');
-                const row = {};
-                headers.forEach((header, index) => {
-                    row[header] = values[index] ? values[index].trim() : '';
-                });
-                data.push(row);
-            }
-
-            return data;
-        }
-
-        function checkReadyToGenerate() {
-            const ready = ftAgentsData && ptAgentsData && flightsData;
-            document.getElementById('generateBtn').disabled = !ready;
-        }
-
-        // Schedule generation
-        document.getElementById('generateBtn').addEventListener('click', generateSchedule);
-
-        function generateSchedule() {
-            document.getElementById('loading').classList.add('active');
-            document.getElementById('results').style.display = 'none';
-
-            // Simulate processing time for better UX
-            setTimeout(() => {
-                try {
-                    scheduleResult = createSchedule();
-                    displayResults(scheduleResult);
-                    document.getElementById('loading').classList.remove('active');
-                    document.getElementById('results').style.display = 'block';
-                    document.getElementById('exportBtn').disabled = false;
-                } catch (error) {
-                    alert('Error generating schedule: ' + error.message);
-                    document.getElementById('loading').classList.remove('active');
-                }
-            }, 1000);
-        }
-
-        function createSchedule() {
-            console.log('=== Starting Schedule Generation ===');
-            
-            // Get selected day of week
-            const dayOfWeek = document.getElementById('dayOfWeek').value;
-            console.log(`Scheduling for: ${dayOfWeek}`);
-            
-            const teams = extractTeams(ftAgentsData, ptAgentsData, dayOfWeek);
-            console.log(`Teams extracted: ${teams.length}`);
-            
-            if (teams.length === 0) {
-                throw new Error(`No teams found for ${dayOfWeek}. Check that your agent CSV files have ${dayOfWeek} data.`);
-            }
-            
-            // Log team shift distribution
-            const shiftDistribution = {};
-            teams.forEach(team => {
-                const hour = Math.floor(team.startMinutes / 60);
-                shiftDistribution[hour] = (shiftDistribution[hour] || 0) + 1;
-            });
-            console.log('Team shift distribution:', shiftDistribution);
-            
-            const flights = processFlights(flightsData);
-            console.log(`Flights processed: ${flights.length}`);
-            
-            if (flights.length === 0) {
-                throw new Error('No valid flights found. Check that your flight CSV has departure times.');
-            }
-
-            // Analyze flight timing distribution
-            const flightsByHour = {};
-            flights.forEach(f => {
-                const hour = Math.floor(f.timeMinutes / 60);
-                if (!flightsByHour[hour]) flightsByHour[hour] = [];
-                flightsByHour[hour].push(f);
-            });
-            console.log('Flights by hour:', Object.keys(flightsByHour).sort().map(h => `${h}:00=${flightsByHour[h].length}`).join(', '));
-
-            // Phase-based assignment
-            const assignments = [];
-            const unassigned = [];
-            const teamWorkload = {};
-
-            teams.forEach(team => {
-                teamWorkload[team.id] = {
-                    team: team,
-                    operations: [],
-                    count: 0
-                };
-            });
-
-            console.log('Starting phase-based assignment...');
-
-            // **PHASE 0: Mark first 3 earliest domestic flights as "Overnight Serviced"**
-            const veryEarlyDomestic = flights
-                .filter(f => f.type === 'Domestic' && f.timeMinutes < 420)
-                .slice(0, 3);
-            
-            console.log(`Phase 0 - Overnight Serviced: ${veryEarlyDomestic.length} flights`);
-            veryEarlyDomestic.forEach(flight => {
-                assignments.push({
-                    flight: flight,
-                    team: 'OVERNIGHT',
-                    phase: 'overnight_serviced'
-                });
-                console.log(`✓ ${flight.flight} (${flight.time}) → OVERNIGHT`);
-            });
-
-            // **PHASE 1: Early domestic flights (before 07:00) - PRIORITIZE COVERAGE**
-            const earlyDomestic = flights.filter(f => 
-                f.type === 'Domestic' && 
-                f.timeMinutes < 420 &&
-                !assignments.some(a => a.flight === f)
-            );
-            console.log(`Phase 1 - Early Domestic: ${earlyDomestic.length} flights`);
-            assignFlightsFlexible(earlyDomestic, teams, assignments, unassigned, teamWorkload, 'early_domestic');
-
-            // **PHASE 2: Morning international bank (07:00-10:00)**
-            const morningIntl = flights.filter(f => 
-                (f.type === 'International' || f.type === 'Precleared') && 
-                f.timeMinutes >= 420 && f.timeMinutes < 600 &&
-                !assignments.some(a => a.flight === f)
-            );
-            console.log(`Phase 2 - Morning International: ${morningIntl.length} flights`);
-            assignFlightsFlexible(morningIntl, teams, assignments, unassigned, teamWorkload, 'morning_intl');
-
-            // **PHASE 3: Mid-day domestic (07:00-18:00)**
-            const middayDomestic = flights.filter(f => 
-                f.type === 'Domestic' && 
-                f.timeMinutes >= 420 && f.timeMinutes < 1080 &&
-                !assignments.some(a => a.flight === f)
-            );
-            console.log(`Phase 3 - Midday Domestic: ${middayDomestic.length} flights`);
-            assignFlightsFlexible(middayDomestic, teams, assignments, unassigned, teamWorkload, 'midday_domestic');
-
-            // **PHASE 4: Evening international bank (18:00-22:00)**
-            const eveningIntl = flights.filter(f => 
-                (f.type === 'International' || f.type === 'Precleared') && 
-                f.timeMinutes >= 1080 && f.timeMinutes < 1320 &&
-                !assignments.some(a => a.flight === f)
-            );
-            console.log(`Phase 4 - Evening International: ${eveningIntl.length} flights`);
-            assignFlightsFlexible(eveningIntl, teams, assignments, unassigned, teamWorkload, 'evening_intl');
-
-            // **PHASE 5: Late domestic (after 18:00)**
-            const lateDomestic = flights.filter(f => 
-                f.type === 'Domestic' && 
-                f.timeMinutes >= 1080 &&
-                !assignments.some(a => a.flight === f)
-            );
-            console.log(`Phase 5 - Late Domestic: ${lateDomestic.length} flights`);
-            assignFlightsFlexible(lateDomestic, teams, assignments, unassigned, teamWorkload, 'late_domestic');
-
-            // **PHASE 6: Final sweep - try to assign remaining with relaxed constraints**
-            const stillUnassigned = flights.filter(f => 
-                !assignments.some(a => a.flight === f)
-            );
-            if (stillUnassigned.length > 0) {
-                console.log(`Phase 6 - Final Sweep: ${stillUnassigned.length} flights remaining`);
-                assignFlightsVeryFlexible(stillUnassigned, teams, assignments, unassigned, teamWorkload, 'final_sweep');
-            }
-
-            console.log(`=== Schedule Complete ===`);
-            console.log(`Assigned: ${assignments.length}, Unassigned: ${unassigned.length}`);
-            console.log(`Coverage: ${Math.round((assignments.length / flights.length) * 100)}%`);
-
-            // Analyze coverage gaps
-            const unassignedByTime = {};
-            unassigned.forEach(u => {
-                const hour = Math.floor(u.flight.timeMinutes / 60);
-                if (!unassignedByTime[hour]) unassignedByTime[hour] = [];
-                unassignedByTime[hour].push(u.flight.flight);
-            });
-            if (Object.keys(unassignedByTime).length > 0) {
-                console.log('Coverage gaps by hour:', unassignedByTime);
-            }
-
-            return {
-                assignments,
-                unassigned,
-                teamWorkload: Object.values(teamWorkload),
-                stats: calculateStats(assignments, unassigned, teams),
-                overnightCount: veryEarlyDomestic.length,
-                dayOfWeek: dayOfWeek,
-                coverageGaps: unassignedByTime
-            };
-        }
-
-        function extractTeams(ftData, ptData, dayOfWeek) {
-            const teams = [];
-            
-            // Column names for Thursday
-            const shiftCol = 'Thursday';
-            const deptCol = 'Thurs Department';
-            const teamCol = 'Thurs Team';
-
-            console.log('Extracting teams for Thursday');
-            console.log('Sample FT agent:', ftData[0]);
-            console.log('Sample PT agent:', ptData[0]);
-
-            // Process full-time agents
-            ftData.forEach(agent => {
-                const shift = agent[shiftCol];
-                const dept = agent[deptCol];
-                const team = agent[teamCol];
-
-                if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
-                    // Parse shift start time (format: "0500-1330" or "1300-2130")
-                    const startTime = shift.split('-')[0];
-                    const startMinutes = timeToMinutes(startTime);
+                if (canAssignTerminator(team, terminator, workload)) {
+                    // Score based on:
+                    // 1. Teams with operations already (returning to unit)
+                    // 2. Timing compatibility
+                    // 3. Workload balance
+                    let score = 0;
                     
-                    teams.push({
-                        id: team,
-                        department: dept,
-                        shift: shift,
-                        startMinutes: startMinutes,
-                        type: 'FT',
-                        name: `${agent['First Name']} ${agent['Last Name']}`
-                    });
-                }
-            });
-
-            // Process part-time agents
-            ptData.forEach(agent => {
-                const shift = agent[shiftCol];
-                const dept = agent[deptCol];
-                const team = agent[teamCol];
-
-                if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
-                    // Parse shift start time (format: "0500-1330" or "1300-2130")
-                    const startTime = shift.split('-')[0];
-                    const startMinutes = timeToMinutes(startTime);
+                    if (workload.operations.length > 0) score += 100; // Prefer teams already working
                     
-                    teams.push({
-                        id: team,
-                        department: dept,
-                        shift: shift,
-                        startMinutes: startMinutes,
-                        type: 'PT',
-                        name: `${agent['First Name']} ${agent['Last Name']}`
-                    });
-                }
-            });
-
-            console.log(`Extracted ${teams.length} teams`);
-            if (teams.length > 0) {
-                console.log('Sample team:', teams[0]);
-                console.log(`Team ${teams[0].id} starts at ${teams[0].startMinutes} minutes (${minutesToTime(teams[0].startMinutes)})`);
-            }
-            return teams;
-        }
-
-        function processFlights(flightData) {
-            console.log('Processing flights, total rows:', flightData.length);
-            if (flightData.length > 0) {
-                console.log('Sample flight data:', flightData[0]);
-            }
-            
-            const processed = flightData
-                .filter(f => {
-                    // Filter based on departure scheduled time
-                    if (!f.Dep_Scheduled || f.Dep_Scheduled === '') return false;
-                    if (!f.Dep_Flight || f.Dep_Flight === '') return false;
-                    return true;
-                })
-                .map(f => {
-                    // Parse the time from Dep_Scheduled
-                    let timeStr = f.Dep_Scheduled;
-                    
-                    // Extract time portion if it's a full datetime
-                    if (timeStr.includes(' ')) {
-                        const parts = timeStr.split(' ');
-                        // Get the time part (should be index 1)
-                        timeStr = parts[parts.length - 1];
+                    const lastOp = workload.operations[workload.operations.length - 1];
+                    if (lastOp && lastOp.timeMinutes < terminator.timeMinutes) {
+                        // Team can strip terminator after completing last operation
+                        const timeDiff = terminator.timeMinutes - lastOp.timeMinutes;
+                        score += Math.max(0, 50 - timeDiff / 10); // Closer is better
                     }
                     
-                    const timeMinutes = timeToMinutes(timeStr);
+                    score -= workload.count * 20; // Prefer less loaded teams
                     
-                    return {
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestTeam = team;
+                    }
+                }
+            }
+
+            if (bestTeam) {
+                const workload = teamWorkload[bestTeam.id];
+                assignments.push({
+                    flight: terminator,
+                    team: bestTeam.id,
+                    phase: phase,
+                    operation: 'strip'
+                });
+                workload.operations.push(terminator);
+                workload.count += 1; // Terminator strip = 1.0 operation
+                assigned = true;
+                
+                if (index < 5) {
+                    console.log(`✓ Terminator ${terminator.flight} (STA ${terminator.time}) → ${bestTeam.id} strip`);
+                }
+            } else {
+                unassigned.push({
+                    flight: terminator,
+                    reason: 'No team available for terminator strip within shift constraints'
+                });
+                
+                if (index < 5) {
+                    console.log(`✗ Terminator ${terminator.flight} (STA ${terminator.time}) - unassigned`);
+                }
+            }
+        });
+        
+        const terminatorAssignments = assignments.filter(a => a.operation === 'strip' && a.flight.operationType === 'Terminator');
+        console.log(`Terminators assigned: ${terminatorAssignments.length}/${terminators.length}`);
+    }
+    
+    function canAssignTerminator(team, terminator, workload) {
+        // Team must have started shift
+        const teamReadyTime = team.startMinutes + 45; // Flexible prep time
+        
+        // Terminator can be stripped anytime from arrival through end of shift
+        // Must complete: strip (15 min) + return (30 min) before shift end
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        const stripTime = terminator.timeMinutes + 15; // Pax deplane
+        const finishTime = stripTime + 15 + 30; // Strip + return
+        
+        if (finishTime > shiftEnd) {
+            return false; // Would go past shift end
+        }
+        
+        // Check workload limits
+        const maxOps = team.type === 'PT' ? 5 : 7;
+        if (workload.count >= maxOps) {
+            return false;
+        }
+        
+        // Can add terminator to truck if capacity allows
+        // Terminators use 1 truck slot
+        if (!canAddToTruck(workload.truckLoad, terminator)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    function canAddToTruck(truckLoad, flight) {
+        // International flights always require dedicated truck (max 1)
+        if (flight.type === 'International' || flight.type === 'Precleared') {
+            return truckLoad.length === 0; // Truck must be empty
+        }
+        
+        // Domestic flights
+        // Check if truck already has international (can't mix)
+        const hasIntl = truckLoad.some(f => f.type === 'International' || f.type === 'Precleared');
+        if (hasIntl) {
+            return false; // Can't add domestic to international truck
+        }
+        
+        // Check if truck has space (max 3 domestic)
+        return truckLoad.length < 3;
+    }
+    
+    function extractTeams(ftData, ptData, dayOfWeek) {
+        const teams = [];
+        
+        // Column names for Thursday
+        const shiftCol = 'Thursday';
+        const deptCol = 'Thurs Department';
+        const teamCol = 'Thurs Team';
+
+        console.log('Extracting teams for Thursday');
+        console.log('Sample FT agent:', ftData[0]);
+        console.log('Sample PT agent:', ptData[0]);
+
+        // Process full-time agents
+        ftData.forEach(agent => {
+            const shift = agent[shiftCol];
+            const dept = agent[deptCol];
+            const team = agent[teamCol];
+
+            if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
+                // Parse shift start time (format: "0500-1330" or "1300-2130")
+                const startTime = shift.split('-')[0];
+                const startMinutes = timeToMinutes(startTime);
+                
+                teams.push({
+                    id: team,
+                    department: dept,
+                    shift: shift,
+                    startMinutes: startMinutes,
+                    type: 'FT',
+                    name: `${agent['First Name']} ${agent['Last Name']}`
+                });
+            }
+        });
+
+        // Process part-time agents
+        ptData.forEach(agent => {
+            const shift = agent[shiftCol];
+            const dept = agent[deptCol];
+            const team = agent[teamCol];
+
+            if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
+                // Parse shift start time (format: "0500-1330" or "1300-2130")
+                const startTime = shift.split('-')[0];
+                const startMinutes = timeToMinutes(startTime);
+                
+                teams.push({
+                    id: team,
+                    department: dept,
+                    shift: shift,
+                    startMinutes: startMinutes,
+                    type: 'PT',
+                    name: `${agent['First Name']} ${agent['Last Name']}`
+                });
+            }
+        });
+
+        console.log(`Extracted ${teams.length} teams`);
+        if (teams.length > 0) {
+            console.log('Sample team:', teams[0]);
+            console.log(`Team ${teams[0].id} starts at ${teams[0].startMinutes} minutes (${minutesToTime(teams[0].startMinutes)})`);
+        }
+        return teams;
+    }
+
+    function processFlights(flightData) {
+        console.log('Processing flights, total rows:', flightData.length);
+        if (flightData.length > 0) {
+            console.log('Sample flight data:', flightData[0]);
+        }
+        
+        const departures = [];
+        const terminators = [];
+        
+        flightData.forEach(f => {
+            // Process DEPARTURES (has Dep_Flight and Dep_Scheduled)
+            if (f.Dep_Flight && f.Dep_Scheduled && f.Dep_Scheduled !== '') {
+                let depTimeStr = f.Dep_Scheduled;
+                if (depTimeStr.includes(' ')) {
+                    const parts = depTimeStr.split(' ');
+                    depTimeStr = parts[parts.length - 1];
+                }
+                const depTimeMinutes = timeToMinutes(depTimeStr);
+                
+                // Parse arrival time if exists (for turn flights)
+                let arrTimeMinutes = 0;
+                let arrTimeStr = '';
+                if (f.Arr_ETA && f.Arr_ETA !== '') {
+                    arrTimeStr = f.Arr_ETA;
+                    if (arrTimeStr.includes(' ')) {
+                        const parts = arrTimeStr.split(' ');
+                        arrTimeStr = parts[parts.length - 1];
+                    }
+                    arrTimeMinutes = timeToMinutes(arrTimeStr);
+                }
+                
+                // Calculate ground time for turn flights
+                const groundTime = arrTimeMinutes > 0 ? depTimeMinutes - arrTimeMinutes : 0;
+                
+                // Classify flight operation type
+                let operationType = 'Overnight'; // Default
+                if (f.TurnType === 'Overnight') {
+                    operationType = 'Overnight';
+                } else if (arrTimeMinutes > 0) {
+                    // It's a turn flight
+                    if (groundTime <= 180) {
+                        operationType = 'ShortTurn'; // ≤3 hours, same team strips+loads
+                    } else {
+                        operationType = 'LongTurn'; // >3 hours, can split strip/load
+                    }
+                }
+                
+                if (depTimeMinutes > 0 && depTimeMinutes < 1440) {
+                    departures.push({
                         flight: f.Dep_Flight,
                         origin: f.Arr_Origin || 'N/A',
                         destination: f.Dep_Dest || 'N/A',
-                        time: timeStr,
-                        timeMinutes: timeMinutes,
+                        time: depTimeStr,
+                        timeMinutes: depTimeMinutes,
                         type: f.Dep_Type || 'Domestic',
                         gate: f.Dep_Gate || f.Arr_Gate || 'TBD',
                         passengers: parseInt(f.Dep_Total_Customers) || parseInt(f.Arr_Total_Customers) || 0,
                         turnType: f.TurnType,
                         equipment: f.Dep_Equip || f.Arr_Equip,
                         arrivalFlight: f.Arr_Flight || '',
-                        arrivalTime: f.Arr_ETA || ''
-                    };
-                })
-                .filter(f => f.timeMinutes > 0 && f.timeMinutes < 1440) // Valid times only (0-24 hours)
-                .sort((a, b) => a.timeMinutes - b.timeMinutes);
-            
-            console.log('Processed flights:', processed.length);
-            if (processed.length > 0) {
-                console.log('First flight:', processed[0]);
-                console.log('Last flight:', processed[processed.length - 1]);
-            }
-            
-            return processed;
-        }
-
-        function assignFlights(flights, teams, assignments, unassigned, teamWorkload, phase) {
-            console.log(`\n--- Assigning ${flights.length} flights in phase: ${phase} ---`);
-            
-            if (flights.length === 0) {
-                console.log('No flights to assign in this phase');
-                return;
-            }
-            
-            flights.forEach((flight, index) => {
-                let assigned = false;
-                let bestTeam = null;
-                let minWorkload = Infinity;
-                let rejectionReasons = [];
-
-                // Find best available team (with least workload)
-                for (let team of teams) {
-                    const workload = teamWorkload[team.id];
-                    
-                    // Check if team can handle this flight
-                    if (canAssignFlight(team, flight, workload)) {
-                        if (workload.count < minWorkload) {
-                            minWorkload = workload.count;
-                            bestTeam = team;
-                        }
-                    } else {
-                        // Track why we couldn't assign
-                        const teamReady = team.startMinutes - 15;
-                        if (flight.timeMinutes < teamReady) {
-                            rejectionReasons.push(`${team.id}: too early (flight ${flight.timeMinutes} < team ready ${teamReady})`);
-                        } else if (workload.count >= 8) {
-                            rejectionReasons.push(`${team.id}: full (${workload.count} ops)`);
-                        }
-                    }
-                }
-
-                if (bestTeam) {
-                    const workload = teamWorkload[bestTeam.id];
-                    assignments.push({
-                        flight: flight,
-                        team: bestTeam.id,
-                        phase: phase
+                        arrivalTime: arrTimeStr,
+                        arrivalTimeMinutes: arrTimeMinutes,
+                        groundTime: groundTime,
+                        operationType: operationType
                     });
-                    workload.operations.push(flight);
-                    workload.count++;
-                    assigned = true;
-                    
-                    if (index < 3) { // Log first few assignments
-                        console.log(`✓ ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
-                    }
-                } else {
-                    unassigned.push({
-                        flight: flight,
-                        reason: 'No available team matching timing and operational constraints'
+                }
+            }
+            
+            // Process TERMINATORS (has Arr_Flight but no Dep_Flight, TurnType = "Terminator")
+            if (f.TurnType === 'Terminator' && f.Arr_Flight && f.Arr_ETA && f.Arr_ETA !== '') {
+                let arrTimeStr = f.Arr_ETA;
+                if (arrTimeStr.includes(' ')) {
+                    const parts = arrTimeStr.split(' ');
+                    arrTimeStr = parts[parts.length - 1];
+                }
+                const arrTimeMinutes = timeToMinutes(arrTimeStr);
+                
+                if (arrTimeMinutes > 0 && arrTimeMinutes < 1440) {
+                    terminators.push({
+                        flight: f.Arr_Flight,
+                        origin: f.Arr_Origin || 'N/A',
+                        destination: 'PHL',
+                        time: arrTimeStr,
+                        timeMinutes: arrTimeMinutes,
+                        type: f.Arr_Type || 'Domestic',
+                        gate: f.Arr_Gate || 'TBD',
+                        passengers: parseInt(f.Arr_Total_Customers) || 0,
+                        turnType: 'Terminator',
+                        equipment: f.Arr_Equip,
+                        operationType: 'Terminator'
                     });
-                    
-                    if (index < 3) { // Log first few failures
-                        console.log(`✗ ${flight.flight} (${flight.time}) - ${rejectionReasons.slice(0, 2).join(', ')}`);
-                    }
                 }
-            });
-            
-            console.log(`Phase complete: ${flights.filter((f, i) => assignments.some(a => a.flight === f)).length} assigned, ${flights.filter((f, i) => unassigned.some(u => u.flight === f)).length} unassigned`);
-        }
-        
-        // More flexible assignment - reduces time gaps and increases workload limits
-        function assignFlightsFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
-            flights.forEach((flight, index) => {
-                let assigned = false;
-                let bestTeam = null;
-                let minWorkload = Infinity;
-
-                for (let team of teams) {
-                    const workload = teamWorkload[team.id];
-                    
-                    if (canAssignFlightFlexible(team, flight, workload)) {
-                        if (workload.count < minWorkload) {
-                            minWorkload = workload.count;
-                            bestTeam = team;
-                        }
-                    }
-                }
-
-                if (bestTeam) {
-                    const workload = teamWorkload[bestTeam.id];
-                    assignments.push({
-                        flight: flight,
-                        team: bestTeam.id,
-                        phase: phase
-                    });
-                    workload.operations.push(flight);
-                    workload.count++;
-                    assigned = true;
-                } else {
-                    // Don't add to unassigned yet - let other phases try
-                }
-            });
-        }
-        
-        // Very flexible assignment for final sweep - maximum coverage
-        function assignFlightsVeryFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
-            flights.forEach((flight, index) => {
-                let assigned = false;
-                let bestTeam = null;
-                let minWorkload = Infinity;
-
-                for (let team of teams) {
-                    const workload = teamWorkload[team.id];
-                    
-                    if (canAssignFlightVeryFlexible(team, flight, workload)) {
-                        if (workload.count < minWorkload) {
-                            minWorkload = workload.count;
-                            bestTeam = team;
-                        }
-                    }
-                }
-
-                if (bestTeam) {
-                    const workload = teamWorkload[bestTeam.id];
-                    assignments.push({
-                        flight: flight,
-                        team: bestTeam.id,
-                        phase: phase
-                    });
-                    workload.operations.push(flight);
-                    workload.count++;
-                    assigned = true;
-                    console.log(`✓ Final sweep: ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
-                } else {
-                    unassigned.push({
-                        flight: flight,
-                        reason: 'No team available even with relaxed constraints'
-                    });
-                    console.log(`✗ Cannot assign: ${flight.flight} (${flight.time})`);
-                }
-            });
-        }
-        
-        function canAssignFlightFlexible(team, flight, workload) {
-            // More lenient version for better coverage
-            const teamReadyTime = team.startMinutes - 30; // Allow 30 min early
-            if (flight.timeMinutes < teamReadyTime) return false;
-            
-            const shiftEnd = team.startMinutes + (8.5 * 60);
-            const maxTime = shiftEnd + 180; // Allow 3 hours overtime
-            if (flight.timeMinutes > maxTime) return false;
-
-            if (workload.count >= 10) return false; // Higher limit
-
-            if (workload.operations.length > 0) {
-                const lastOp = workload.operations[workload.operations.length - 1];
-                const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
-                
-                if (timeSinceLastOp < 25) return false; // Reduced gap
-                
-                if (flight.type === 'International' || flight.type === 'Precleared') {
-                    if (lastOp.type === 'Domestic' && timeSinceLastOp < 50) return false;
-                    if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && timeSinceLastOp < 75) return false;
-                }
-            }
-
-            return true;
-        }
-        
-        function canAssignFlightVeryFlexible(team, flight, workload) {
-            // Maximally lenient for final sweep
-            const teamReadyTime = team.startMinutes - 45; // Very early start OK
-            if (flight.timeMinutes < teamReadyTime) return false;
-            
-            const shiftEnd = team.startMinutes + (8.5 * 60);
-            const maxTime = shiftEnd + 240; // Allow 4 hours overtime if needed
-            if (flight.timeMinutes > maxTime) return false;
-
-            if (workload.count >= 12) return false; // Maximum operations
-
-            if (workload.operations.length > 0) {
-                const lastOp = workload.operations[workload.operations.length - 1];
-                const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
-                
-                if (timeSinceLastOp < 20) return false; // Minimum 20 min
-            }
-
-            return true;
-        }
-
-        function canAssignFlight(team, flight, workload) {
-            // Check if team has started (allow 15 minutes before shift for early prep)
-            const teamReadyTime = team.startMinutes - 15;
-            if (flight.timeMinutes < teamReadyTime) {
-                return false;
-            }
-            
-            // Check if flight is too late (after shift end + 2 hours overtime potential)
-            const shiftEnd = team.startMinutes + (8.5 * 60); // 8.5 hour shift
-            const maxTime = shiftEnd + 120; // Allow 2 hours overtime
-            if (flight.timeMinutes > maxTime) {
-                return false;
-            }
-
-            // Check workload limit (max 8 operations to be more flexible)
-            if (workload.count >= 8) {
-                return false;
-            }
-
-            // Check timing conflicts with last operation
-            if (workload.operations.length > 0) {
-                const lastOp = workload.operations[workload.operations.length - 1];
-                const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
-                
-                // Must have some gap between operations
-                if (timeSinceLastOp < 30) {
-                    return false;
-                }
-                
-                // International flights need more time
-                if (flight.type === 'International' || flight.type === 'Precleared') {
-                    // Need at least 60 minutes after last domestic operation
-                    if (lastOp.type === 'Domestic' && timeSinceLastOp < 60) {
-                        return false;
-                    }
-                    // Need at least 90 minutes after last international operation
-                    if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && timeSinceLastOp < 90) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        function calculateStats(assignments, unassigned, teams) {
-            const domestic = assignments.filter(a => a.flight.type === 'Domestic').length;
-            const international = assignments.filter(a => a.flight.type === 'International').length;
-
-            return {
-                totalFlights: assignments.length + unassigned.length,
-                assigned: assignments.length,
-                unassigned: unassigned.length,
-                domestic: domestic,
-                international: international,
-                teamsDeployed: teams.length,
-                coveragePercent: Math.round((assignments.length / (assignments.length + unassigned.length)) * 100)
-            };
-        }
-
-        function timeToMinutes(timeStr) {
-            if (!timeStr || timeStr === '') return 0;
-            
-            // Remove any whitespace
-            timeStr = timeStr.trim();
-            
-            // Handle full datetime format like "1/0/1900 23:55"
-            if (timeStr.includes('/')) {
-                const parts = timeStr.split(' ');
-                if (parts.length > 1) {
-                    timeStr = parts[1]; // Get the time part
-                } else {
-                    return 0; // Invalid format
-                }
-            }
-            
-            // Handle time with AM/PM
-            if (timeStr.includes('AM') || timeStr.includes('PM')) {
-                const isPM = timeStr.includes('PM');
-                timeStr = timeStr.replace(/AM|PM/g, '').trim();
-                const parts = timeStr.split(':');
-                let hours = parseInt(parts[0]);
-                const mins = parseInt(parts[1] || 0);
-                
-                if (isPM && hours !== 12) hours += 12;
-                if (!isPM && hours === 12) hours = 0;
-                
-                return hours * 60 + mins;
-            }
-            
-            // Handle 24-hour format with colon (HH:MM or H:MM)
-            if (timeStr.includes(':')) {
-                const parts = timeStr.split(':');
-                const hours = parseInt(parts[0]);
-                const mins = parseInt(parts[1] || 0);
-                
-                if (isNaN(hours) || isNaN(mins)) return 0;
-                return hours * 60 + mins;
-            }
-            
-            // Handle 4-digit format without colon (HHMM like "0500" or "1330")
-            if (timeStr.length === 4 && !isNaN(timeStr)) {
-                const hours = parseInt(timeStr.substring(0, 2));
-                const mins = parseInt(timeStr.substring(2, 4));
-                
-                if (isNaN(hours) || isNaN(mins)) return 0;
-                return hours * 60 + mins;
-            }
-            
-            // Handle 3-digit format (HMM like "500" for 5:00)
-            if (timeStr.length === 3 && !isNaN(timeStr)) {
-                const hours = parseInt(timeStr.substring(0, 1));
-                const mins = parseInt(timeStr.substring(1, 3));
-                
-                if (isNaN(hours) || isNaN(mins)) return 0;
-                return hours * 60 + mins;
-            }
-            
-            // Handle 1 or 2 digit format (just hours)
-            if ((timeStr.length === 1 || timeStr.length === 2) && !isNaN(timeStr)) {
-                const hours = parseInt(timeStr);
-                if (isNaN(hours)) return 0;
-                return hours * 60;
-            }
-            
-            console.warn(`Unable to parse time: "${timeStr}"`);
-            return 0;
-        }
-
-        function minutesToTime(minutes) {
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-        }
-
-        // Display results
-        function displayResults(result) {
-            // Display header with day of week
-            const statsGrid = document.getElementById('statsGrid');
-            statsGrid.innerHTML = `
-                <div class="stat-card" style="grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                    <h3 style="color: rgba(255,255,255,0.9);">Scheduling Day</h3>
-                    <div class="value" style="color: white;">${result.dayOfWeek}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Flights</h3>
-                    <div class="value">${result.stats.totalFlights}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Assigned</h3>
-                    <div class="value" style="color: #28a745;">${result.stats.assigned}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Coverage</h3>
-                    <div class="value">${result.stats.coveragePercent}%</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Domestic</h3>
-                    <div class="value">${result.stats.domestic}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>International</h3>
-                    <div class="value">${result.stats.international}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Teams Deployed</h3>
-                    <div class="value">${result.stats.teamsDeployed}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Avg per Team</h3>
-                    <div class="value">${(result.stats.assigned / result.stats.teamsDeployed).toFixed(1)}</div>
-                </div>
-            `;
-            
-            // Show coverage gap alert if exists
-            if (result.coverageGaps && Object.keys(result.coverageGaps).length > 0) {
-                const gapHours = Object.keys(result.coverageGaps).sort((a,b) => a-b);
-                const gapSummary = gapHours.map(h => `${h}:00 (${result.coverageGaps[h].length})`).join(', ');
-                statsGrid.innerHTML += `
-                    <div class="stat-card" style="grid-column: span 4; background: #fff3cd; border-left: 4px solid #ffc107;">
-                        <h3 style="color: #856404;">Coverage Gaps by Hour</h3>
-                        <div style="font-size: 0.9em; color: #856404; margin-top: 8px;">${gapSummary}</div>
-                    </div>
-                `;
-            }
-
-            // Display team workload
-            const teamTableBody = document.getElementById('teamTableBody');
-            teamTableBody.innerHTML = '';
-            result.teamWorkload.forEach(tw => {
-                const firstFlight = tw.operations[0];
-                const lastFlight = tw.operations[tw.operations.length - 1];
-                const flightNumbers = tw.operations.map(op => op.flight).join(', ');
-                
-                // Calculate shift utilization
-                const shiftStart = tw.team.startMinutes;
-                const shiftEnd = shiftStart + (8.5 * 60);
-                const actualStart = firstFlight ? firstFlight.timeMinutes : shiftStart;
-                const actualEnd = lastFlight ? lastFlight.timeMinutes : shiftStart;
-                const utilization = tw.count > 0 ? Math.round(((actualEnd - actualStart) / (8.5 * 60)) * 100) : 0;
-                
-                const row = `
-                    <tr>
-                        <td><strong>${tw.team.id}</strong></td>
-                        <td>${tw.team.shift}</td>
-                        <td>${tw.count}</td>
-                        <td>
-                            <div class="workload-bar">
-                                <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
-                            </div>
-                        </td>
-                        <td style="font-size: 0.85em; max-width: 300px; overflow-x: auto;">${flightNumbers || '-'}</td>
-                        <td>${firstFlight ? firstFlight.time : '-'}</td>
-                        <td>${lastFlight ? lastFlight.time : '-'}</td>
-                    </tr>
-                `;
-                teamTableBody.innerHTML += row;
-            });
-            
-            // Add OVERNIGHT row if there are overnight assignments
-            const overnightFlights = result.assignments.filter(a => a.team === 'OVERNIGHT');
-            if (overnightFlights.length > 0) {
-                const overnightNumbers = overnightFlights.map(a => a.flight.flight).join(', ');
-                const firstOvernight = overnightFlights[0].flight;
-                const lastOvernight = overnightFlights[overnightFlights.length - 1].flight;
-                const row = `
-                    <tr style="background: #fff3cd;">
-                        <td><strong>OVERNIGHT</strong></td>
-                        <td>Previous Day</td>
-                        <td>${overnightFlights.length}</td>
-                        <td>
-                            <div class="workload-bar">
-                                <div class="workload-fill" style="width: ${(overnightFlights.length / 6) * 100}%; background: #ffc107;"></div>
-                            </div>
-                        </td>
-                        <td style="font-size: 0.85em;">${overnightNumbers}</td>
-                        <td>${firstOvernight.time}</td>
-                        <td>${lastOvernight.time}</td>
-                    </tr>
-                `;
-                teamTableBody.innerHTML = row + teamTableBody.innerHTML; // Add at top
-            }
-            
-            // Generate detailed team groupings
-            generateTeamDetailedView(result);
-
-            // Display flight assignments with editable team assignments
-            const flightTableBody = document.getElementById('flightTableBody');
-            flightTableBody.innerHTML = '';
-            
-            // Get list of all teams for dropdown
-            const allTeams = [...new Set(result.teamWorkload.map(tw => tw.team.id))].sort();
-            allTeams.unshift('OVERNIGHT'); // Add overnight option
-            
-            result.assignments.forEach((a, index) => {
-                const teamDropdown = allTeams.map(teamId => 
-                    `<option value="${teamId}" ${teamId === a.team ? 'selected' : ''}>${teamId}</option>`
-                ).join('');
-                
-                const row = `
-                    <tr data-assignment-index="${index}">
-                        <td><strong>${a.flight.flight}</strong></td>
-                        <td>${a.flight.destination}</td>
-                        <td>${a.flight.time}</td>
-                        <td><span class="status-badge status-${a.flight.type.toLowerCase()}">${a.flight.type}</span></td>
-                        <td>
-                            <select class="team-selector" onchange="updateAssignment(${index}, this.value)">
-                                ${teamDropdown}
-                            </select>
-                        </td>
-                        <td>${a.flight.gate}</td>
-                    </tr>
-                `;
-                flightTableBody.innerHTML += row;
-            });
-
-            // Display unassigned flights
-            if (result.unassigned.length > 0) {
-                document.getElementById('unassignedSection').style.display = 'block';
-                document.getElementById('unassignedAlert').textContent = 
-                    `${result.unassigned.length} flights could not be assigned. Consider adding overtime or split shifts.`;
-                
-                const unassignedTableBody = document.getElementById('unassignedTableBody');
-                unassignedTableBody.innerHTML = '';
-                result.unassigned.forEach(u => {
-                    const row = `
-                        <tr>
-                            <td><strong>${u.flight.flight}</strong></td>
-                            <td>${u.flight.destination}</td>
-                            <td>${u.flight.time}</td>
-                            <td><span class="status-badge status-${u.flight.type.toLowerCase()}">${u.flight.type}</span></td>
-                            <td>${u.reason}</td>
-                        </tr>
-                    `;
-                    unassignedTableBody.innerHTML += row;
-                });
-            }
-        }
-
-        // Export to Excel
-        document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-        
-        // Handle assignment changes
-        function updateAssignment(index, newTeam) {
-            if (!scheduleResult) return;
-            
-            const assignment = scheduleResult.assignments[index];
-            const oldTeam = assignment.team;
-            
-            // Update the assignment
-            assignment.team = newTeam;
-            
-            // Recalculate team workloads
-            scheduleResult.teamWorkload.forEach(tw => {
-                // Remove from old team
-                if (tw.team.id === oldTeam) {
-                    tw.operations = tw.operations.filter(op => op !== assignment.flight);
-                    tw.count = tw.operations.length;
-                }
-                // Add to new team (only if it's not OVERNIGHT)
-                if (tw.team.id === newTeam) {
-                    tw.operations.push(assignment.flight);
-                    tw.operations.sort((a, b) => a.timeMinutes - b.timeMinutes);
-                    tw.count = tw.operations.length;
-                }
-            });
-            
-            // Refresh the team workload display
-            updateTeamWorkloadDisplay();
-            
-            console.log(`Updated: ${assignment.flight.flight} from ${oldTeam} to ${newTeam}`);
-        }
-        
-        function generateTeamDetailedView(result) {
-            const container = document.getElementById('teamDetailedGroups');
-            container.innerHTML = '';
-            
-            // First add OVERNIGHT if it exists
-            const overnightFlights = result.assignments.filter(a => a.team === 'OVERNIGHT');
-            if (overnightFlights.length > 0) {
-                const overnightCard = createTeamDetailCard('OVERNIGHT', 'Previous Day (23:00-05:00)', overnightFlights, true);
-                container.innerHTML += overnightCard;
-            }
-            
-            // Then add all regular teams sorted by shift start time
-            const sortedTeams = [...result.teamWorkload].sort((a, b) => a.team.startMinutes - b.team.startMinutes);
-            
-            sortedTeams.forEach(tw => {
-                if (tw.count > 0) {
-                    const teamAssignments = result.assignments.filter(a => a.team === tw.team.id);
-                    const teamCard = createTeamDetailCard(tw.team.id, tw.team.shift, teamAssignments, false);
-                    container.innerHTML += teamCard;
-                }
-            });
-        }
-        
-        function createTeamDetailCard(teamId, shift, assignments, isOvernight) {
-            const flights = assignments.map(a => a.flight).sort((a, b) => a.timeMinutes - b.timeMinutes);
-            const firstFlight = flights[0];
-            const lastFlight = flights[flights.length - 1];
-            
-            // Calculate timing details
-            const totalSpan = lastFlight ? ((lastFlight.timeMinutes - firstFlight.timeMinutes) / 60).toFixed(1) : '0';
-            const avgGap = flights.length > 1 ? 
-                ((lastFlight.timeMinutes - firstFlight.timeMinutes) / (flights.length - 1)).toFixed(0) : 'N/A';
-            
-            // Calculate buffers between flights
-            const buffers = [];
-            for (let i = 1; i < flights.length; i++) {
-                const gap = flights[i].timeMinutes - flights[i-1].timeMinutes;
-                buffers.push(gap);
-            }
-            const avgBuffer = buffers.length > 0 ? (buffers.reduce((a,b) => a+b, 0) / buffers.length).toFixed(0) : 'N/A';
-            const minBuffer = buffers.length > 0 ? Math.min(...buffers) : 'N/A';
-            
-            const flightRows = flights.map((flight, idx) => {
-                const buffer = idx > 0 ? `${flights[idx].timeMinutes - flights[idx-1].timeMinutes} min` : '-';
-                return `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td><strong>${flight.flight}</strong></td>
-                        <td>${flight.destination}</td>
-                        <td><strong>${flight.time}</strong></td>
-                        <td><span class="status-badge status-${flight.type.toLowerCase()}">${flight.type}</span></td>
-                        <td>${flight.gate}</td>
-                        <td>${flight.passengers || 'N/A'}</td>
-                        <td>${flight.equipment || 'N/A'}</td>
-                        <td>${buffer}</td>
-                    </tr>
-                `;
-            }).join('');
-            
-            return `
-                <div class="team-detail-card ${isOvernight ? 'overnight-card' : ''}">
-                    <div class="team-detail-header">
-                        <div>
-                            <h3>${teamId}</h3>
-                            <div style="opacity: 0.9; margin-top: 5px;">Shift: ${shift}</div>
-                        </div>
-                        <div class="team-detail-info">
-                            <div class="team-detail-info-item">
-                                <label>Operations</label>
-                                <value>${flights.length}</value>
-                            </div>
-                            <div class="team-detail-info-item">
-                                <label>Time Span</label>
-                                <value>${totalSpan} hrs</value>
-                            </div>
-                            <div class="team-detail-info-item">
-                                <label>Avg Buffer</label>
-                                <value>${avgBuffer} min</value>
-                            </div>
-                            <div class="team-detail-info-item">
-                                <label>Min Buffer</label>
-                                <value>${minBuffer} min</value>
-                            </div>
-                            <div class="team-detail-info-item">
-                                <label>First Flight</label>
-                                <value>${firstFlight.time}</value>
-                            </div>
-                            <div class="team-detail-info-item">
-                                <label>Last Flight</label>
-                                <value>${lastFlight.time}</value>
-                            </div>
-                        </div>
-                    </div>
-                    <table class="team-flights-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Flight</th>
-                                <th>Destination</th>
-                                <th>STD</th>
-                                <th>Type</th>
-                                <th>Gate</th>
-                                <th>PAX</th>
-                                <th>Equipment</th>
-                                <th>Buffer</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${flightRows}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-        
-        function updateTeamWorkloadDisplay() {
-            const teamTableBody = document.getElementById('teamTableBody');
-            teamTableBody.innerHTML = '';
-            
-            scheduleResult.teamWorkload.forEach(tw => {
-                const firstFlight = tw.operations[0];
-                const lastFlight = tw.operations[tw.operations.length - 1];
-                const flightNumbers = tw.operations.map(op => op.flight).join(', ');
-                const row = `
-                    <tr>
-                        <td><strong>${tw.team.id}</strong></td>
-                        <td>${tw.team.shift}</td>
-                        <td>${tw.count}</td>
-                        <td>
-                            <div class="workload-bar">
-                                <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
-                            </div>
-                        </td>
-                        <td style="font-size: 0.85em;">${flightNumbers || '-'}</td>
-                        <td>${firstFlight ? firstFlight.time : '-'}</td>
-                        <td>${lastFlight ? lastFlight.time : '-'}</td>
-                    </tr>
-                `;
-                teamTableBody.innerHTML += row;
-            });
-            
-            // Add OVERNIGHT row
-            const overnightFlights = scheduleResult.assignments.filter(a => a.team === 'OVERNIGHT');
-            if (overnightFlights.length > 0) {
-                const overnightNumbers = overnightFlights.map(a => a.flight.flight).join(', ');
-                const firstOvernight = overnightFlights[0].flight;
-                const lastOvernight = overnightFlights[overnightFlights.length - 1].flight;
-                const row = `
-                    <tr style="background: #fff3cd;">
-                        <td><strong>OVERNIGHT</strong></td>
-                        <td>Previous Day</td>
-                        <td>${overnightFlights.length}</td>
-                        <td>
-                            <div class="workload-bar">
-                                <div class="workload-fill" style="width: ${(overnightFlights.length / 6) * 100}%; background: #ffc107;"></div>
-                            </div>
-                        </td>
-                        <td style="font-size: 0.85em;">${overnightNumbers}</td>
-                        <td>${firstOvernight.time}</td>
-                        <td>${lastOvernight.time}</td>
-                    </tr>
-                `;
-                teamTableBody.innerHTML = row + teamTableBody.innerHTML;
-            }
-        }
-        
-        // Make updateAssignment globally available
-        window.updateAssignment = updateAssignment;
-        
-        // AI Chat Assistant
-        async function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            if (!scheduleResult) {
-                addChatMessage('Please generate a schedule first!', 'error');
-                return;
-            }
-            
-            // Clear input and disable button
-            input.value = '';
-            const sendBtn = document.getElementById('sendChatBtn');
-            sendBtn.disabled = true;
-            sendBtn.textContent = '⏳ Thinking...';
-            
-            // Show user message
-            addChatMessage(message, 'user');
-            
-            try {
-                // Process the request locally using pattern matching
-                const result = await processScheduleRequest(message);
-                
-                if (result.success) {
-                    addChatMessage(result.message, 'success');
-                    
-                    // Apply changes if any
-                    if (result.changes && result.changes.length > 0) {
-                        result.changes.forEach(change => {
-                            updateAssignment(change.index, change.newTeam);
-                        });
-                    }
-                    
-                    // Refresh display
-                    displayResults(scheduleResult);
-                } else {
-                    addChatMessage(result.message, 'assistant');
-                }
-            } catch (error) {
-                addChatMessage('Sorry, I encountered an error: ' + error.message, 'error');
-            }
-            
-            // Re-enable button
-            sendBtn.disabled = false;
-            sendBtn.textContent = '✨ Send Request';
-        }
-        
-        function addChatMessage(text, type) {
-            const messagesDiv = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${type}`;
-            messageDiv.textContent = text;
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-        
-        async function processScheduleRequest(message) {
-            const lowerMessage = message.toLowerCase();
-            
-            // Pattern 1: Move specific flight to team
-            const movePattern = /move.*flight\s+(\d+).*to\s+(tm\d+|overnight)/i;
-            const moveMatch = message.match(movePattern);
-            
-            if (moveMatch) {
-                const flightNum = moveMatch[1];
-                const targetTeam = moveMatch[2].toUpperCase();
-                
-                const assignmentIndex = scheduleResult.assignments.findIndex(a => 
-                    a.flight.flight.includes(flightNum)
-                );
-                
-                if (assignmentIndex === -1) {
-                    return {
-                        success: false,
-                        message: `Flight ${flightNum} not found in current assignments. It may be unassigned.`
-                    };
-                }
-                
-                const assignment = scheduleResult.assignments[assignmentIndex];
-                const oldTeam = assignment.team;
-                
-                return {
-                    success: true,
-                    message: `✓ Moved flight ${flightNum} from ${oldTeam} to ${targetTeam}`,
-                    changes: [{ index: assignmentIndex, newTeam: targetTeam }]
-                };
-            }
-            
-            // Pattern 2: Show overloaded teams
-            if (lowerMessage.includes('overload') || lowerMessage.includes('too many')) {
-                const overloaded = scheduleResult.teamWorkload
-                    .filter(tw => tw.count > 6)
-                    .map(tw => `${tw.team.id}: ${tw.count} operations`)
-                    .join(', ');
-                
-                if (overloaded) {
-                    return {
-                        success: false,
-                        message: `Overloaded teams (>6 ops): ${overloaded}`
-                    };
-                } else {
-                    return {
-                        success: false,
-                        message: 'No teams are currently overloaded (all have ≤6 operations)'
-                    };
-                }
-            }
-            
-            // Pattern 3: Show underutilized teams
-            if (lowerMessage.includes('underutilized') || lowerMessage.includes('under')) {
-                const underutilized = scheduleResult.teamWorkload
-                    .filter(tw => tw.count < 3 && tw.count > 0)
-                    .map(tw => `${tw.team.id}: ${tw.count} operations`)
-                    .join(', ');
-                
-                if (underutilized) {
-                    return {
-                        success: false,
-                        message: `Underutilized teams (<3 ops): ${underutilized}`
-                    };
-                } else {
-                    return {
-                        success: false,
-                        message: 'All teams have adequate workload (≥3 operations)'
-                    };
-                }
-            }
-            
-            // Pattern 4: Balance workload
-            if (lowerMessage.includes('balance')) {
-                // Find most overloaded and least loaded teams
-                const sorted = [...scheduleResult.teamWorkload].sort((a, b) => b.count - a.count);
-                const mostLoaded = sorted[0];
-                const leastLoaded = sorted[sorted.length - 1];
-                
-                if (mostLoaded.count - leastLoaded.count <= 2) {
-                    return {
-                        success: false,
-                        message: 'Schedule is already well balanced. Max difference is ≤2 operations.'
-                    };
-                }
-                
-                return {
-                    success: false,
-                    message: `Workload spread: ${mostLoaded.team.id} has ${mostLoaded.count} ops, ${leastLoaded.team.id} has ${leastLoaded.count} ops. Consider manually moving flights between them.`
-                };
-            }
-            
-            // Pattern 5: Reassign all flights from one team to another
-            const reassignPattern = /reassign.*from\s+(tm\d+).*to\s+(tm\d+)/i;
-            const reassignMatch = message.match(reassignPattern);
-            
-            if (reassignMatch) {
-                const fromTeam = reassignMatch[1].toUpperCase();
-                const toTeam = reassignMatch[2].toUpperCase();
-                
-                const changes = [];
-                scheduleResult.assignments.forEach((a, index) => {
-                    if (a.team === fromTeam) {
-                        changes.push({ index, newTeam: toTeam });
-                    }
-                });
-                
-                if (changes.length === 0) {
-                    return {
-                        success: false,
-                        message: `No flights found assigned to ${fromTeam}`
-                    };
-                }
-                
-                return {
-                    success: true,
-                    message: `✓ Reassigned ${changes.length} flights from ${fromTeam} to ${toTeam}`,
-                    changes: changes
-                };
-            }
-            
-            // Pattern 6: Show team details
-            const teamPattern = /show.*team\s+(tm\d+|overnight)/i;
-            const teamMatch = message.match(teamPattern);
-            
-            if (teamMatch) {
-                const teamId = teamMatch[1].toUpperCase();
-                const teamWorkload = scheduleResult.teamWorkload.find(tw => tw.team.id === teamId);
-                
-                if (!teamWorkload) {
-                    const overnightFlights = scheduleResult.assignments.filter(a => a.team === 'OVERNIGHT');
-                    if (teamId === 'OVERNIGHT' && overnightFlights.length > 0) {
-                        const flights = overnightFlights.map(a => 
-                            `${a.flight.flight} (${a.flight.time} to ${a.flight.destination})`
-                        ).join(', ');
-                        return {
-                            success: false,
-                            message: `OVERNIGHT: ${overnightFlights.length} flights - ${flights}`
-                        };
-                    }
-                    return {
-                        success: false,
-                        message: `Team ${teamId} not found`
-                    };
-                }
-                
-                const flights = teamWorkload.operations.map(op => 
-                    `${op.flight} (${op.time} to ${op.destination})`
-                ).join(', ');
-                
-                return {
-                    success: false,
-                    message: `${teamId}: ${teamWorkload.count} operations - ${flights}`
-                };
-            }
-            
-            // Default response
-            return {
-                success: false,
-                message: "I can help you with:\n• Move flight [number] to [team]\n• Show team [team]\n• Show overloaded/underutilized teams\n• Reassign flights from [team] to [team]\n• Balance workload"
-            };
-        }
-        
-        // Allow Enter key to send message
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                chatInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendChatMessage();
-                    }
-                });
             }
         });
         
-        window.sendChatMessage = sendChatMessage;
+        console.log('Processed departures:', departures.length);
+        console.log('Processed terminators:', terminators.length);
+        
+        // Log flight type distribution
+        const typeCount = {
+            Overnight: departures.filter(f => f.operationType === 'Overnight').length,
+            ShortTurn: departures.filter(f => f.operationType === 'ShortTurn').length,
+            LongTurn: departures.filter(f => f.operationType === 'LongTurn').length,
+            Terminator: terminators.length
+        };
+        console.log('Flight operation types:', typeCount);
+        
+        return { departures: departures.sort((a, b) => a.timeMinutes - b.timeMinutes), terminators };
+    }
 
-        function exportToExcel() {
-            if (!scheduleResult) return;
+    function assignFlights(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        console.log(`\n--- Assigning ${flights.length} flights in phase: ${phase} ---`);
+        
+        if (flights.length === 0) {
+            console.log('No flights to assign in this phase');
+            return;
+        }
+        
+        flights.forEach((flight, index) => {
+            let assigned = false;
+            let bestTeam = null;
+            let minWorkload = Infinity;
+            let rejectionReasons = [];
 
-            const wb = XLSX.utils.book_new();
-
-            // Team Schedule sheet
-            const teamData = scheduleResult.teamWorkload.map(tw => ({
-                'Team': tw.team.id,
-                'Department': tw.team.department,
-                'Shift': tw.team.shift,
-                'Operations': tw.count,
-                'First Flight': tw.operations[0] ? tw.operations[0].time : '',
-                'Last Flight': tw.operations[tw.operations.length - 1] ? tw.operations[tw.operations.length - 1].time : ''
-            }));
-            const teamSheet = XLSX.utils.json_to_sheet(teamData);
-            XLSX.utils.book_append_sheet(wb, teamSheet, 'Team Schedule');
-
-            // Flight Assignments sheet
-            const flightData = scheduleResult.assignments.map(a => ({
-                'Flight': a.flight.flight,
-                'Destination': a.flight.destination,
-                'Departure Time': a.flight.time,
-                'Type': a.flight.type,
-                'Team': a.team,
-                'Gate': a.flight.gate,
-                'Passengers': a.flight.passengers,
-                'Arrival Flight': a.flight.arrivalFlight,
-                'Arrival Time': a.flight.arrivalTime
-            }));
-            const flightSheet = XLSX.utils.json_to_sheet(flightData);
-            XLSX.utils.book_append_sheet(wb, flightSheet, 'Flight Assignments');
-
-            // Unassigned sheet
-            if (scheduleResult.unassigned.length > 0) {
-                const unassignedData = scheduleResult.unassigned.map(u => ({
-                    'Flight': u.flight.flight,
-                    'Destination': u.flight.destination,
-                    'Departure Time': u.flight.time,
-                    'Type': u.flight.type,
-                    'Reason': u.reason
-                }));
-                const unassignedSheet = XLSX.utils.json_to_sheet(unassignedData);
-                XLSX.utils.book_append_sheet(wb, unassignedSheet, 'Unassigned');
+            // Find best available team (with least workload)
+            for (let team of teams) {
+                const workload = teamWorkload[team.id];
+                
+                // Check if team can handle this flight
+                if (canAssignFlight(team, flight, workload)) {
+                    if (workload.count < minWorkload) {
+                        minWorkload = workload.count;
+                        bestTeam = team;
+                    }
+                } else {
+                    // Track why we couldn't assign
+                    const teamReady = team.startMinutes - 15;
+                    if (flight.timeMinutes < teamReady) {
+                        rejectionReasons.push(`${team.id}: too early (flight ${flight.timeMinutes} < team ready ${teamReady})`);
+                    } else if (workload.count >= 8) {
+                        rejectionReasons.push(`${team.id}: full (${workload.count} ops)`);
+                    }
+                }
             }
 
-            // Save file
-            const date = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(wb, `PHL_Schedule_${date}.xlsx`);
+            if (bestTeam) {
+                const workload = teamWorkload[bestTeam.id];
+                assignments.push({
+                    flight: flight,
+                    team: bestTeam.id,
+                    phase: phase
+                });
+                workload.operations.push(flight);
+                workload.count++;
+                assigned = true;
+                
+                if (index < 3) { // Log first few assignments
+                    console.log(`✓ ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
+                }
+            } else {
+                unassigned.push({
+                    flight: flight,
+                    reason: 'No available team matching timing and operational constraints'
+                });
+                
+                if (index < 3) { // Log first few failures
+                    console.log(`✗ ${flight.flight} (${flight.time}) - ${rejectionReasons.slice(0, 2).join(', ')}`);
+                }
+            }
+        });
+        
+        console.log(`Phase complete: ${flights.filter((f, i) => assignments.some(a => a.flight === f)).length} assigned, ${flights.filter((f, i) => unassigned.some(u => u.flight === f)).length} unassigned`);
+    }
+    
+    function assignFlightsFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        console.log(`\n=== Phase ${phase}: Attempting ${flights.length} flights ===`);
+        let phaseAssigned = 0;
+        
+        flights.forEach((flight, index) => {
+            let assigned = false;
+            let bestTeam = null;
+            let minWorkload = Infinity;
+            let rejectionReasons = [];
+
+            for (let team of teams) {
+                const workload = teamWorkload[team.id];
+                
+                if (canAssignFlightFlexible(team, flight, workload)) {
+                    if (workload.count < minWorkload) {
+                        minWorkload = workload.count;
+                        bestTeam = team;
+                    }
+                } else {
+                    // Track why this team can't take it
+                    const reason = getAssignmentBlocker(team, flight, workload, 'flexible');
+                    if (reason && team.id.includes('TM2')) { // Log TM200s teams
+                        rejectionReasons.push(`${team.id}: ${reason}`);
+                    }
+                }
+            }
+
+            if (bestTeam) {
+                const workload = teamWorkload[bestTeam.id];
+                assignments.push({
+                    flight: flight,
+                    team: bestTeam.id,
+                    phase: phase
+                });
+                workload.operations.push(flight);
+                workload.count++;
+                
+                // Update truck load
+                workload.truckLoad.push(flight);
+                
+                // Check if truck needs to return (3 domestic or 1 international)
+                if (flight.type === 'International' || flight.type === 'Precleared' || workload.truckLoad.length >= 3) {
+                    workload.truckLoad = []; // Reset truck - team returns to unit
+                }
+                
+                assigned = true;
+                phaseAssigned++;
+                
+                if (index < 3 || !assigned) {
+                    console.log(`✓ ${flight.flight} ${flight.operationType} (${flight.time}) → ${bestTeam.id} (ops: ${workload.count})`);
+                }
+            } else {
+                // Log why flight couldn't be assigned
+                if (index < 5) {
+                    console.log(`✗ ${flight.flight} ${flight.operationType} (${flight.time}) - NO TEAM AVAILABLE`);
+                    if (rejectionReasons.length > 0) {
+                        console.log(`  Reasons: ${rejectionReasons.slice(0, 3).join('; ')}`);
+                    }
+                }
+            }
+        });
+        
+        console.log(`Phase ${phase} complete: ${phaseAssigned}/${flights.length} assigned`);
+    }
+    
+    function getAssignmentBlocker(team, flight, workload, mode) {
+        // Returns reason why team can't take this flight
+        
+        let earliestAssignTime = team.startMinutes + (mode === 'flexible' ? 45 : 60);
+        if (flight.operationType === 'ShortTurn') {
+            earliestAssignTime = Math.max(earliestAssignTime, flight.arrivalTimeMinutes + 15);
         }
-    </script>
+        
+        if (flight.timeMinutes < earliestAssignTime) {
+            return `too early (flight ${flight.time} < ready ${minutesToTime(earliestAssignTime)})`;
+        }
+        
+        if (workload.operations.length === 0 && (flight.timeMinutes - team.startMinutes) > 180) {
+            return `first flight too late (>3h after shift start)`;
+        }
+        
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        const serviceTime = (flight.type === 'International' || flight.type === 'Precleared') ? 60 : 40;
+        const returnTime = 30;
+        const latestFlightTime = shiftEnd - serviceTime - returnTime;
+        
+        if (flight.timeMinutes > latestFlightTime) {
+            return `too late (shift ends ${minutesToTime(shiftEnd)})`;
+        }
+        
+        const maxOps = mode === 'flexible' ? (team.type === 'PT' ? 5 : 7) : (team.type === 'PT' ? 4 : 6);
+        if (workload.count >= maxOps) {
+            return `at capacity (${workload.count}/${maxOps} ops)`;
+        }
+        
+        if (!canAddToTruck(workload.truckLoad, flight)) {
+            return `truck full (${workload.truckLoad.length} slots)`;
+        }
+        
+        if (workload.operations.length > 0) {
+            const lastOp = workload.operations[workload.operations.length - 1];
+            const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
+            
+            if (lastOp.type === 'Domestic' && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 35) return `too close to last op (${timeSinceLastOp}min < 35min)`;
+            }
+            
+            if (lastOp.type === 'Domestic' && (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 120) return `need 120min for intl reload (${timeSinceLastOp}min)`;
+            }
+            
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 115) return `need 115min from intl (${timeSinceLastOp}min)`;
+            }
+            
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && 
+                (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 145) return `intl→intl needs 145min (${timeSinceLastOp}min)`;
+            }
+        }
+        
+        return null;
+    }
+    
+    // Very flexible assignment for final sweep - maximum coverage
+    function assignFlightsVeryFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        flights.forEach((flight, index) => {
+            let assigned = false;
+            let bestTeam = null;
+            let minWorkload = Infinity;
+
+            for (let team of teams) {
+                const workload = teamWorkload[team.id];
+                
+                if (canAssignFlightVeryFlexible(team, flight, workload)) {
+                    if (workload.count < minWorkload) {
+                        minWorkload = workload.count;
+                        bestTeam = team;
+                    }
+                }
+            }
+
+            if (bestTeam) {
+                const workload = teamWorkload[bestTeam.id];
+                assignments.push({
+                    flight: flight,
+                    team: bestTeam.id,
+                    phase: phase
+                });
+                workload.operations.push(flight);
+                workload.count++;
+                
+                // Update truck load
+                workload.truckLoad.push(flight);
+                
+                // Check if truck needs to return
+                if (flight.type === 'International' || flight.type === 'Precleared' || workload.truckLoad.length >= 3) {
+                    workload.truckLoad = [];
+                }
+                
+                assigned = true;
+                console.log(`✓ Final sweep: ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
+            } else {
+                unassigned.push({
+                    flight: flight,
+                    reason: 'No team available even with relaxed constraints'
+                });
+                console.log(`✗ Cannot assign: ${flight.flight} (${flight.time})`);
+            }
+        });
+    }
+    
+    function canAssignFlightFlexible(team, flight, workload) {
+        // For SHORT TURNS: Team must arrive at STA (arrival time)
+        let earliestAssignTime = team.startMinutes + 45; // Flexible prep time
+        
+        if (flight.operationType === 'ShortTurn') {
+            earliestAssignTime = Math.max(earliestAssignTime, flight.arrivalTimeMinutes + 15);
+        }
+        
+        if (flight.timeMinutes < earliestAssignTime) return false;
+        
+        // First flight within 3 hours of shift start (allows afternoon/evening teams)
+        if (workload.operations.length === 0 && (flight.timeMinutes - team.startMinutes) > 180) {
+            return false;
+        }
+        
+        // Calculate shift end - STILL NO OVERTIME
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        const serviceTime = (flight.type === 'International' || flight.type === 'Precleared') ? 60 : 40;
+        const returnTime = 30;
+        const latestFlightTime = shiftEnd - serviceTime - returnTime;
+        
+        if (flight.timeMinutes > latestFlightTime) return false;
+
+        // Workload limits: Higher for coverage (PT: 5, FT: 7)
+        const maxOps = team.type === 'PT' ? 5 : 7;
+        if (workload.count >= maxOps) return false;
+        
+        // Check truck capacity
+        if (!canAddToTruck(workload.truckLoad, flight)) {
+            return false;
+        }
+
+        if (workload.operations.length > 0) {
+            const lastOp = workload.operations[workload.operations.length - 1];
+            const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
+            
+            // Domestic → Domestic: Slightly reduced buffer
+            if (lastOp.type === 'Domestic' && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 35) return false;
+            }
+            
+            // Domestic → International: Must return for dedicated load
+            if (lastOp.type === 'Domestic' && (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 120) return false;
+            }
+            
+            // International → Domestic: Must return for new domestic load
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 115) return false;
+            }
+            
+            // International → International: ONLY 1 intl per truck (full cycle)
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && 
+                (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 145) return false;
+            }
+        }
+
+        return true;
+    }
+    
+    function canAssignFlightVeryFlexible(team, flight, workload) {
+        // For SHORT TURNS: Team must arrive at STA
+        let earliestAssignTime = team.startMinutes + 30; // Minimum prep time in final sweep
+        
+        if (flight.operationType === 'ShortTurn') {
+            earliestAssignTime = Math.max(earliestAssignTime, flight.arrivalTimeMinutes + 15);
+        }
+        
+        if (flight.timeMinutes < earliestAssignTime) return false;
+        
+        // Allow up to 90 min before first flight in final sweep
+        if (workload.operations.length === 0 && (flight.timeMinutes - team.startMinutes) > 150) {
+            return false;
+        }
+        
+        // STILL NO OVERTIME - shift end is hard limit
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        const serviceTime = (flight.type === 'International' || flight.type === 'Precleared') ? 60 : 40;
+        const returnTime = 30;
+        const latestFlightTime = shiftEnd - serviceTime - returnTime;
+        
+        if (flight.timeMinutes > latestFlightTime) return false;
+
+        // Final sweep: Maximum coverage (PT: 6, FT: 8)
+        const maxOps = team.type === 'PT' ? 6 : 8;
+        if (workload.count >= maxOps) return false;
+        
+        // Check truck capacity
+        if (!canAddToTruck(workload.truckLoad, flight)) {
+            return false;
+        }
+
+        if (workload.operations.length > 0) {
+            const lastOp = workload.operations[workload.operations.length - 1];
+            const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
+            
+            // Domestic → Domestic: Minimum buffer
+            if (lastOp.type === 'Domestic' && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 30) return false;
+            }
+            
+            // Domestic → International: Still need return/reload
+            if (lastOp.type === 'Domestic' && (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 100) return false;
+            }
+            
+            // International → Domestic: Still need return/reload
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 100) return false;
+            }
+            
+            // International → International: ONLY 1 intl per truck (full cycle)
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && 
+                (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 130) return false; // Minimum possible
+            }
+        }
+
+        return true;
+    }
+
+    function canAssignFlight(team, flight, workload) {
+        // For SHORT TURNS: Team must arrive at STA (arrival time)
+        // They strip (15 min pax + 15 min strip) then load for departure
+        let earliestAssignTime = team.startMinutes + 60; // Default prep time
+        
+        if (flight.operationType === 'ShortTurn') {
+            // Team needs to be at gate by STA + 15 min (pax deplane)
+            earliestAssignTime = Math.max(earliestAssignTime, flight.arrivalTimeMinutes + 15);
+        }
+        
+        if (flight.timeMinutes < earliestAssignTime) {
+            return false;
+        }
+        
+        // First flight within 3 hours of shift start (allows afternoon/evening teams)
+        if (workload.operations.length === 0 && (flight.timeMinutes - team.startMinutes) > 180) {
+            return false;
+        }
+        
+        // Calculate shift end time - NO OVERTIME ALLOWED
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        
+        // Flight must complete service and return BEFORE shift end
+        const serviceTime = (flight.type === 'International' || flight.type === 'Precleared') ? 60 : 40;
+        const returnTime = 30;
+        const latestFlightTime = shiftEnd - serviceTime - returnTime;
+        
+        if (flight.timeMinutes > latestFlightTime) {
+            return false;
+        }
+
+        // Workload limits - Increase to ensure team utilization
+        // PT: 4 flights, FT: 6 flights (will allow more in flexible modes)
+        const maxOps = team.type === 'PT' ? 4 : 6;
+        if (workload.count >= maxOps) {
+            return false;
+        }
+        
+        // Check truck capacity before adding
+        if (!canAddToTruck(workload.truckLoad, flight)) {
+            return false;
+        }
+
+        // Check timing conflicts with last operation
+        if (workload.operations.length > 0) {
+            const lastOp = workload.operations[workload.operations.length - 1];
+            const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
+            
+            // DOMESTIC → DOMESTIC (on same truck load if space available)
+            // Just need time to finish servicing previous flight
+            if (lastOp.type === 'Domestic' && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 40) return false;
+            }
+            
+            // DOMESTIC → INTERNATIONAL (need to return and get new dedicated load)
+            if (lastOp.type === 'Domestic' && (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 135) return false;
+            }
+            
+            // INTERNATIONAL → DOMESTIC (need to return and get new domestic load)
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && flight.type === 'Domestic') {
+                if (timeSinceLastOp < 130) return false;
+            }
+            
+            // INTERNATIONAL → INTERNATIONAL (ONLY 1 intl per truck - need full cycle)
+            if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && 
+                (flight.type === 'International' || flight.type === 'Precleared')) {
+                if (timeSinceLastOp < 155) return false;
+            }
+        }
+
+        return true;
+    }
+
+    function calculateStats(assignments, unassigned, departures, terminators, teams) {
+        const domestic = assignments.filter(a => a.flight.type === 'Domestic').length;
+        const international = assignments.filter(a => a.flight.type === 'International').length;
+        const shortTurns = assignments.filter(a => a.flight.operationType === 'ShortTurn').length;
+        const terminatorAssignments = assignments.filter(a => a.flight.operationType === 'Terminator').length;
+
+        const totalFlights = departures.length + terminators.length;
+        
+        return {
+            totalFlights: totalFlights,
+            assigned: assignments.length,
+            unassigned: unassigned.length,
+            domestic: domestic,
+            international: international,
+            shortTurns: shortTurns,
+            terminators: terminatorAssignments,
+            teamsDeployed: teams.length,
+            coveragePercent: Math.round((assignments.length / totalFlights) * 100)
+        };
+    }
+
+    function timeToMinutes(timeStr) {
+        if (!timeStr || timeStr === '') return 0;
+        
+        // Remove any whitespace
+        timeStr = timeStr.trim();
+        
+        // Handle full datetime format like "1/0/1900 23:55"
+        if (timeStr.includes('/')) {
+            const parts = timeStr.split(' ');
+            if (parts.length > 1) {
+                timeStr = parts[1]; // Get the time part
+            } else {
+                return 0; // Invalid format
+            }
+        }
+        
+        // Handle time with AM/PM
+        if (timeStr.includes('AM') || timeStr.includes('PM')) {
+            const isPM = timeStr.includes('PM');
+            timeStr = timeStr.replace(/AM|PM/g, '').trim();
+            const parts = timeStr.split(':');
+            let hours = parseInt(parts[0]);
+            const mins = parseInt(parts[1] || 0);
+            
+            if (isPM && hours !== 12) hours += 12;
+            if (!isPM && hours === 12) hours = 0;
+            
+            return hours * 60 + mins;
+        }
+        
+        // Handle 24-hour format with colon (HH:MM or H:MM)
+        if (timeStr.includes(':')) {
+            const parts = timeStr.split(':');
+            const hours = parseInt(parts[0]);
+            const mins = parseInt(parts[1] || 0);
+            
+            if (isNaN(hours) || isNaN(mins)) return 0;
+            return hours * 60 + mins;
+        }
+        
+        // Handle 4-digit format without colon (HHMM like "0500" or "1330")
+        if (timeStr.length === 4 && !isNaN(timeStr)) {
+            const hours = parseInt(timeStr.substring(0, 2));
+            const mins = parseInt(timeStr.substring(2, 4));
+            
+            if (isNaN(hours) || isNaN(mins)) return 0;
+            return hours * 60 + mins;
+        }
+        
+        // Handle 3-digit format (HMM like "500" for 5:00)
+        if (timeStr.length === 3 && !isNaN(timeStr)) {
+            const hours = parseInt(timeStr.substring(0, 1));
+            const mins = parseInt(timeStr.substring(1, 3));
+            
+            if (isNaN(hours) || isNaN(mins)) return 0;
+            return hours * 60 + mins;
+        }
+        
+        // Handle 1 or 2 digit format (just hours)
+        if ((timeStr.length === 1 || timeStr.length === 2) && !isNaN(timeStr)) {
+            const hours = parseInt(timeStr);
+            if (isNaN(hours)) return 0;
+            return hours * 60;
+        }
+        
+        console.warn(`Unable to parse time: "${timeStr}"`);
+        return 0;
+    }
+
+    function minutesToTime(minutes) {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+    }
+
+    // Display results
+    function displayResults(result) {
+        // Display header with day of week
+        const statsGrid = document.getElementById('statsGrid');
+        statsGrid.innerHTML = `
+            <div class="stat-card" style="grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h3 style="color: rgba(255,255,255,0.9);">Scheduling Day</h3>
+                <div class="value" style="color: white;">${result.dayOfWeek}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Operations</h3>
+                <div class="value">${result.stats.totalFlights}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Assigned</h3>
+                <div class="value" style="color: #28a745;">${result.stats.assigned}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Coverage</h3>
+                <div class="value">${result.stats.coveragePercent}%</div>
+            </div>
+            <div class="stat-card">
+                <h3>Short Turns</h3>
+                <div class="value">${result.stats.shortTurns}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Terminators</h3>
+                <div class="value">${result.stats.terminators}</div>
+            </div>
+            <div class="stat-card">
+                <h3>International</h3>
+                <div class="value">${result.stats.international}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Teams Deployed</h3>
+                <div class="value">${result.stats.teamsDeployed}</div>
+            </div>
+        `;
+        
+        // Show coverage gap alert if exists
+        if (result.coverageGaps && Object.keys(result.coverageGaps).length > 0) {
+            const gapHours = Object.keys(result.coverageGaps).sort((a,b) => a-b);
+            const gapSummary = gapHours.map(h => `${h}:00 (${result.coverageGaps[h].length})`).join(', ');
+            statsGrid.innerHTML += `
+                <div class="stat-card" style="grid-column: span 4; background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h3 style="color: #856404;">Coverage Gaps by Hour</h3>
+                    <div style="font-size: 0.9em; color: #856404; margin-top: 8px;">${gapSummary}</div>
+                </div>
+            `;
+        }
+
+        // Show idle team alert
+        if (result.idleTeams && result.idleTeams.length > 0) {
+            statsGrid.innerHTML += `
+                <div class="stat-card" style="grid-column: span 4; background: #f8d7da; border-left: 4px solid #dc3545;">
+                    <h3 style="color: #721c24;">⚠️ Idle Teams (${result.idleTeams.length})</h3>
+                    <div style="font-size: 0.9em; color: #721c24; margin-top: 8px;">${result.idleTeams.join(', ')}</div>
+                </div>
+            `;
+        }
+
+        // Display team workload
+        const teamTableBody = document.getElementById('teamTableBody');
+        teamTableBody.innerHTML = '';
+        result.teamWorkload.forEach(tw => {
+            const firstFlight = tw.operations[0];
+            const lastFlight = tw.operations[tw.operations.length - 1];
+            const flightNumbers = tw.operations.map(op => op.flight).join(', ');
+            
+            // Calculate shift end and when last flight finishes
+            const shiftEnd = tw.team.startMinutes + (8.5 * 60);
+            const shiftEndTime = minutesToTime(shiftEnd);
+            const lastFlightFinish = lastFlight ? lastFlight.timeMinutes + ((lastFlight.type === 'International' || lastFlight.type === 'Precleared') ? 60 : 40) + 30 : 0;
+            const finishTime = lastFlight ? minutesToTime(lastFlightFinish) : '-';
+            const withinShift = lastFlightFinish <= shiftEnd;
+            
+            const row = `
+                <tr>
+                    <td><strong>${tw.team.id}</strong> <span style="font-size: 0.8em; color: #6c757d;">(${tw.team.type})</span></td>
+                    <td>${tw.team.shift}</td>
+                    <td>${tw.count}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 0.85em; max-width: 300px; overflow-x: auto;">${flightNumbers || '-'}</td>
+                    <td>${firstFlight ? firstFlight.time : '-'}</td>
+                    <td>${lastFlight ? lastFlight.time : '-'}</td>
+                    <td>${finishTime} ${withinShift ? '<span style="color: #28a745;">✓</span>' : '<span style="color: #dc3545;">⚠️</span>'}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML += row;
+        });
+        
+        // Add OVERNIGHT row if there are overnight assignments
+        const overnightFlights = result.assignments.filter(a => a.team === 'OVERNIGHT');
+        if (overnightFlights.length > 0) {
+            const overnightNumbers = overnightFlights.map(a => a.flight.flight).join(', ');
+            const firstOvernight = overnightFlights[0].flight;
+            const lastOvernight = overnightFlights[overnightFlights.length - 1].flight;
+            const row = `
+                <tr style="background: #fff3cd;">
+                    <td><strong>OVERNIGHT</strong></td>
+                    <td>Previous Day</td>
+                    <td>${overnightFlights.length}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(overnightFlights.length / 6) * 100}%; background: #ffc107;"></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 0.85em;">${overnightNumbers}</td>
+                    <td>${firstOvernight.time}</td>
+                    <td>${lastOvernight.time}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML = row + teamTableBody.innerHTML; // Add at top
+        }
+        
+        // Generate detailed team groupings
+        generateTeamDetailedView(result);
+
+        // Display flight assignments with editable team assignments
+        const flightTableBody = document.getElementById('flightTableBody');
+        flightTableBody.innerHTML = '';
+        
+        // Get list of all teams for dropdown
+        const allTeams = [...new Set(result.teamWorkload.map(tw => tw.team.id))].sort();
+        allTeams.unshift('OVERNIGHT'); // Add overnight option
+        
+        result.assignments.forEach((a, index) => {
+            const teamDropdown = allTeams.map(teamId => 
+                `<option value="${teamId}" ${teamId === a.team ? 'selected' : ''}>${teamId}</option>`
+            ).join('');
+            
+            // Display operation type badge
+            let opTypeBadge = '';
+            if (a.flight.operationType === 'ShortTurn') {
+                opTypeBadge = '<span class="flight-detail-badge" style="background: #17a2b8; color: white;">Short Turn</span>';
+            } else if (a.flight.operationType === 'LongTurn') {
+                opTypeBadge = '<span class="flight-detail-badge" style="background: #6c757d; color: white;">Long Turn</span>';
+            } else if (a.flight.operationType === 'Terminator') {
+                opTypeBadge = '<span class="flight-detail-badge" style="background: #ffc107; color: #000;">Terminator</span>';
+            } else if (a.flight.operationType === 'Overnight') {
+                opTypeBadge = '<span class="flight-detail-badge" style="background: #28a745; color: white;">Overnight</span>';
+            }
+            
+            const row = `
+                <tr data-assignment-index="${index}">
+                    <td><strong>${a.flight.flight}</strong> ${opTypeBadge}</td>
+                    <td>${a.flight.destination}</td>
+                    <td>${a.flight.time}</td>
+                    <td><span class="status-badge status-${a.flight.type.toLowerCase()}">${a.flight.type}</span></td>
+                    <td>
+                        <select class="team-selector" onchange="updateAssignment(${index}, this.value)">
+                            ${teamDropdown}
+                        </select>
+                    </td>
+                    <td>${a.flight.gate}</td>
+                </tr>
+            `;
+            flightTableBody.innerHTML += row;
+        });
+
+        // Display unassigned flights
+        if (result.unassigned.length > 0) {
+            document.getElementById('unassignedSection').style.display = 'block';
+            document.getElementById('unassignedAlert').textContent = 
+                `${result.unassigned.length} flights could not be assigned. Consider adding overtime or split shifts.`;
+            
+            const unassignedTableBody = document.getElementById('unassignedTableBody');
+            unassignedTableBody.innerHTML = '';
+            result.unassigned.forEach(u => {
+                const row = `
+                    <tr>
+                        <td><strong>${u.flight.flight}</strong></td>
+                        <td>${u.flight.destination}</td>
+                        <td>${u.flight.time}</td>
+                        <td><span class="status-badge status-${u.flight.type.toLowerCase()}">${u.flight.type}</span></td>
+                        <td>${u.reason}</td>
+                    </tr>
+                `;
+                unassignedTableBody.innerHTML += row;
+            });
+        }
+    }
+
+    // Export to Excel
+    document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+    
+    // Handle assignment changes
+    function updateAssignment(index, newTeam) {
+        if (!scheduleResult) return;
+        
+        const assignment = scheduleResult.assignments[index];
+        const oldTeam = assignment.team;
+        
+        // Update the assignment
+        assignment.team = newTeam;
+        
+        // Recalculate team workloads
+        scheduleResult.teamWorkload.forEach(tw => {
+            // Remove from old team
+            if (tw.team.id === oldTeam) {
+                tw.operations = tw.operations.filter(op => op !== assignment.flight);
+                tw.count = tw.operations.length;
+            }
+            // Add to new team (only if it's not OVERNIGHT)
+            if (tw.team.id === newTeam) {
+                tw.operations.push(assignment.flight);
+                tw.operations.sort((a, b) => a.timeMinutes - b.timeMinutes);
+                tw.count = tw.operations.length;
+            }
+        });
+        
+        // Refresh the team workload display
+        updateTeamWorkloadDisplay();
+        
+        console.log(`Updated: ${assignment.flight.flight} from ${oldTeam} to ${newTeam}`);
+    }
+    
+    function generateTeamDetailedView(result) {
+        const container = document.getElementById('teamDetailedGroups');
+        container.innerHTML = '';
+        
+        // First add OVERNIGHT if it exists
+        const overnightFlights = result.assignments.filter(a => a.team === 'OVERNIGHT');
+        if (overnightFlights.length > 0) {
+            const overnightCard = createTeamDetailCard('OVERNIGHT', 'Previous Day (23:00-05:00)', overnightFlights, true);
+            container.innerHTML += overnightCard;
+        }
+        
+        // Then add all regular teams sorted by shift start time
+        const sortedTeams = [...result.teamWorkload].sort((a, b) => a.team.startMinutes - b.team.startMinutes);
+        
+        sortedTeams.forEach(tw => {
+            if (tw.count > 0) {
+                const teamAssignments = result.assignments.filter(a => a.team === tw.team.id);
+                const teamCard = createTeamDetailCard(tw.team.id, tw.team.shift, teamAssignments, false);
+                container.innerHTML += teamCard;
+            }
+        });
+    }
+    
+    function createTeamDetailCard(teamId, shift, assignments, isOvernight) {
+        const flights = assignments.map(a => a.flight).sort((a, b) => a.timeMinutes - b.timeMinutes);
+        const firstFlight = flights[0];
+        const lastFlight = flights[flights.length - 1];
+        
+        // Calculate timing details
+        const totalSpan = lastFlight ? ((lastFlight.timeMinutes - firstFlight.timeMinutes) / 60).toFixed(1) : '0';
+        const avgGap = flights.length > 1 ? 
+            ((lastFlight.timeMinutes - firstFlight.timeMinutes) / (flights.length - 1)).toFixed(0) : 'N/A';
+        
+        // Calculate buffers between flights
+        const buffers = [];
+        for (let i = 1; i < flights.length; i++) {
+            const gap = flights[i].timeMinutes - flights[i-1].timeMinutes;
+            buffers.push(gap);
+        }
+        const avgBuffer = buffers.length > 0 ? (buffers.reduce((a,b) => a+b, 0) / buffers.length).toFixed(0) : 'N/A';
+        const minBuffer = buffers.length > 0 ? Math.min(...buffers) : 'N/A';
+        
+        // Calculate shift end and finish time
+        const teamType = assignments[0]?.team || 'FT';
+        let shiftEndTime = 'N/A';
+        let finishTime = 'N/A';
+        let statusIcon = '';
+        
+        if (!isOvernight && shift.includes('-')) {
+            const shiftStartStr = shift.split('-')[0];
+            const shiftStartMinutes = timeToMinutes(shiftStartStr);
+            const shiftEndMinutes = shiftStartMinutes + (8.5 * 60);
+            shiftEndTime = minutesToTime(shiftEndMinutes);
+            
+            if (lastFlight) {
+                const serviceTime = (lastFlight.type === 'International' || lastFlight.type === 'Precleared') ? 60 : 40;
+                const returnTime = 30;
+                const finishMinutes = lastFlight.timeMinutes + serviceTime + returnTime;
+                finishTime = minutesToTime(finishMinutes);
+                
+                if (finishMinutes <= shiftEndMinutes) {
+                    statusIcon = '<span style="color: #28a745; font-size: 1.2em; margin-left: 5px;">✓</span>';
+                } else {
+                    statusIcon = '<span style="color: #dc3545; font-size: 1.2em; margin-left: 5px;">⚠️</span>';
+                }
+            }
+        }
+        
+        const flightRows = flights.map((flight, idx) => {
+            const buffer = idx > 0 ? `${flights[idx].timeMinutes - flights[idx-1].timeMinutes} min` : '-';
+            return `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><strong>${flight.flight}</strong></td>
+                    <td>${flight.destination}</td>
+                    <td><strong>${flight.time}</strong></td>
+                    <td><span class="status-badge status-${flight.type.toLowerCase()}">${flight.type}</span></td>
+                    <td>${flight.gate}</td>
+                    <td>${flight.passengers || 'N/A'}</td>
+                    <td>${flight.equipment || 'N/A'}</td>
+                    <td>${buffer}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        return `
+            <div class="team-detail-card ${isOvernight ? 'overnight-card' : ''}">
+                <div class="team-detail-header">
+                    <div>
+                        <h3>${teamId}</h3>
+                        <div style="opacity: 0.9; margin-top: 5px;">Shift: ${shift} ${!isOvernight && shift.includes('-') ? `| Ends: ${shiftEndTime}` : ''}</div>
+                    </div>
+                    <div class="team-detail-info">
+                        <div class="team-detail-info-item">
+                            <label>Operations</label>
+                            <value>${flights.length}</value>
+                        </div>
+                        <div class="team-detail-info-item">
+                            <label>Time Span</label>
+                            <value>${totalSpan} hrs</value>
+                        </div>
+                        <div class="team-detail-info-item">
+                            <label>Avg Buffer</label>
+                            <value>${avgBuffer} min</value>
+                        </div>
+                        <div class="team-detail-info-item">
+                            <label>Min Buffer</label>
+                            <value>${minBuffer} min</value>
+                        </div>
+                        <div class="team-detail-info-item">
+                            <label>First Flight</label>
+                            <value>${firstFlight.time}</value>
+                        </div>
+                        <div class="team-detail-info-item">
+                            <label>Last Flight</label>
+                            <value>${lastFlight.time}</value>
+                        </div>
+                        <div class="team-detail-info-item">
+                            <label>Finish Time</label>
+                            <value>${finishTime}${statusIcon}</value>
+                        </div>
+                    </div>
+                </div>
+                <table class="team-flights-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Flight</th>
+                            <th>Destination</th>
+                            <th>STD</th>
+                            <th>Type</th>
+                            <th>Gate</th>
+                            <th>PAX</th>
+                            <th>Equipment</th>
+                            <th>Buffer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${flightRows}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    function updateTeamWorkloadDisplay() {
+        const teamTableBody = document.getElementById('teamTableBody');
+        teamTableBody.innerHTML = '';
+        
+        scheduleResult.teamWorkload.forEach(tw => {
+            const firstFlight = tw.operations[0];
+            const lastFlight = tw.operations[tw.operations.length - 1];
+            const flightNumbers = tw.operations.map(op => op.flight).join(', ');
+            const row = `
+                <tr>
+                    <td><strong>${tw.team.id}</strong></td>
+                    <td>${tw.team.shift}</td>
+                    <td>${tw.count}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 0.85em;">${flightNumbers || '-'}</td>
+                    <td>${firstFlight ? firstFlight.time : '-'}</td>
+                    <td>${lastFlight ? lastFlight.time : '-'}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML += row;
+        });
+        
+        // Add OVERNIGHT row
+        const overnightFlights = scheduleResult.assignments.filter(a => a.team === 'OVERNIGHT');
+        if (overnightFlights.length > 0) {
+            const overnightNumbers = overnightFlights.map(a => a.flight.flight).join(', ');
+            const firstOvernight = overnightFlights[0].flight;
+            const lastOvernight = overnightFlights[overnightFlights.length - 1].flight;
+            const row = `
+                <tr style="background: #fff3cd;">
+                    <td><strong>OVERNIGHT</strong></td>
+                    <td>Previous Day</td>
+                    <td>${overnightFlights.length}</td>
+                    <td>
+                        <div class="workload-bar">
+                            <div class="workload-fill" style="width: ${(overnightFlights.length / 6) * 100}%; background: #ffc107;"></div>
+                        </div>
+                    </td>
+                    <td style="font-size: 0.85em;">${overnightNumbers}</td>
+                    <td>${firstOvernight.time}</td>
+                    <td>${lastOvernight.time}</td>
+                </tr>
+            `;
+            teamTableBody.innerHTML = row + teamTableBody.innerHTML;
+        }
+    }
+    
+    // Make updateAssignment globally available
+    window.updateAssignment = updateAssignment;
+    
+    // AI Chat Assistant
+    async function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        if (!scheduleResult) {
+            addChatMessage('Please generate a schedule first!', 'error');
+            return;
+        }
+        
+        // Clear input and disable button
+        input.value = '';
+        const sendBtn = document.getElementById('sendChatBtn');
+        sendBtn.disabled = true;
+        sendBtn.textContent = '⏳ Thinking...';
+        
+        // Show user message
+        addChatMessage(message, 'user');
+        
+        try {
+            // Process the request locally using pattern matching
+            const result = await processScheduleRequest(message);
+            
+            if (result.success) {
+                addChatMessage(result.message, 'success');
+                
+                // Apply changes if any
+                if (result.changes && result.changes.length > 0) {
+                    result.changes.forEach(change => {
+                        updateAssignment(change.index, change.newTeam);
+                    });
+                }
+                
+                // Refresh display
+                displayResults(scheduleResult);
+            } else {
+                addChatMessage(result.message, 'assistant');
+            }
+        } catch (error) {
+            addChatMessage('Sorry, I encountered an error: ' + error.message, 'error');
+        }
+        
+        // Re-enable button
+        sendBtn.disabled = false;
+        sendBtn.textContent = '✨ Send Request';
+    }
+    
+    function addChatMessage(text, type) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${type}`;
+        messageDiv.textContent = text;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    async function processScheduleRequest(message) {
+        const lowerMessage = message.toLowerCase();
+        
+        // Pattern 1: Move specific flight to team
+        const movePattern = /move.*flight\s+(\d+).*to\s+(tm\d+|overnight)/i;
+        const moveMatch = message.match(movePattern);
+        
+        if (moveMatch) {
+            const flightNum = moveMatch[1];
+            const targetTeam = moveMatch[2].toUpperCase();
+            
+            const assignmentIndex = scheduleResult.assignments.findIndex(a => 
+                a.flight.flight.includes(flightNum)
+            );
+            
+            if (assignmentIndex === -1) {
+                return {
+                    success: false,
+                    message: `Flight ${flightNum} not found in current assignments. It may be unassigned.`
+                };
+            }
+            
+            const assignment = scheduleResult.assignments[assignmentIndex];
+            const oldTeam = assignment.team;
+            
+            return {
+                success: true,
+                message: `✓ Moved flight ${flightNum} from ${oldTeam} to ${targetTeam}`,
+                changes: [{ index: assignmentIndex, newTeam: targetTeam }]
+            };
+        }
+        
+        // Pattern 2: Show overloaded teams
+        if (lowerMessage.includes('overload') || lowerMessage.includes('too many')) {
+            const overloaded = scheduleResult.teamWorkload
+                .filter(tw => tw.count > 6)
+                .map(tw => `${tw.team.id}: ${tw.count} operations`)
+                .join(', ');
+            
+            if (overloaded) {
+                return {
+                    success: false,
+                    message: `Overloaded teams (>6 ops): ${overloaded}`
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'No teams are currently overloaded (all have ≤6 operations)'
+                };
+            }
+        }
+        
+        // Pattern 3: Show underutilized teams
+        if (lowerMessage.includes('underutilized') || lowerMessage.includes('under')) {
+            const underutilized = scheduleResult.teamWorkload
+                .filter(tw => tw.count < 3 && tw.count > 0)
+                .map(tw => `${tw.team.id}: ${tw.count} operations`)
+                .join(', ');
+            
+            if (underutilized) {
+                return {
+                    success: false,
+                    message: `Underutilized teams (<3 ops): ${underutilized}`
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'All teams have adequate workload (≥3 operations)'
+                };
+            }
+        }
+        
+        // Pattern 4: Balance workload
+        if (lowerMessage.includes('balance')) {
+            // Find most overloaded and least loaded teams
+            const sorted = [...scheduleResult.teamWorkload].sort((a, b) => b.count - a.count);
+            const mostLoaded = sorted[0];
+            const leastLoaded = sorted[sorted.length - 1];
+            
+            if (mostLoaded.count - leastLoaded.count <= 2) {
+                return {
+                    success: false,
+                    message: 'Schedule is already well balanced. Max difference is ≤2 operations.'
+                };
+            }
+            
+            return {
+                success: false,
+                message: `Workload spread: ${mostLoaded.team.id} has ${mostLoaded.count} ops, ${leastLoaded.team.id} has ${leastLoaded.count} ops. Consider manually moving flights between them.`
+            };
+        }
+        
+        // Pattern 5: Reassign all flights from one team to another
+        const reassignPattern = /reassign.*from\s+(tm\d+).*to\s+(tm\d+)/i;
+        const reassignMatch = message.match(reassignPattern);
+        
+        if (reassignMatch) {
+            const fromTeam = reassignMatch[1].toUpperCase();
+            const toTeam = reassignMatch[2].toUpperCase();
+            
+            const changes = [];
+            scheduleResult.assignments.forEach((a, index) => {
+                if (a.team === fromTeam) {
+                    changes.push({ index, newTeam: toTeam });
+                }
+            });
+            
+            if (changes.length === 0) {
+                return {
+                    success: false,
+                    message: `No flights found assigned to ${fromTeam}`
+                };
+            }
+            
+            return {
+                success: true,
+                message: `✓ Reassigned ${changes.length} flights from ${fromTeam} to ${toTeam}`,
+                changes: changes
+            };
+        }
+        
+        // Pattern 6: Show team details
+        const teamPattern = /show.*team\s+(tm\d+|overnight)/i;
+        const teamMatch = message.match(teamPattern);
+        
+        if (teamMatch) {
+            const teamId = teamMatch[1].toUpperCase();
+            const teamWorkload = scheduleResult.teamWorkload.find(tw => tw.team.id === teamId);
+            
+            if (!teamWorkload) {
+                const overnightFlights = scheduleResult.assignments.filter(a => a.team === 'OVERNIGHT');
+                if (teamId === 'OVERNIGHT' && overnightFlights.length > 0) {
+                    const flights = overnightFlights.map(a => 
+                        `${a.flight.flight} (${a.flight.time} to ${a.flight.destination})`
+                    ).join(', ');
+                    return {
+                        success: false,
+                        message: `OVERNIGHT: ${overnightFlights.length} flights - ${flights}`
+                    };
+                }
+                return {
+                    success: false,
+                    message: `Team ${teamId} not found`
+                };
+            }
+            
+            const flights = teamWorkload.operations.map(op => 
+                `${op.flight} (${op.time} to ${op.destination})`
+            ).join(', ');
+            
+            return {
+                success: false,
+                message: `${teamId}: ${teamWorkload.count} operations - ${flights}`
+            };
+        }
+        
+        // Default response
+        return {
+            success: false,
+            message: "I can help you with:\n• Move flight [number] to [team]\n• Show team [team]\n• Show overloaded/underutilized teams\n• Reassign flights from [team] to [team]\n• Balance workload"
+        };
+    }
+    
+    // Allow Enter key to send message
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                }
+            });
+        }
+    });
+    
+    window.sendChatMessage = sendChatMessage;
+
+    function exportToExcel() {
+        if (!scheduleResult) return;
+
+        const wb = XLSX.utils.book_new();
+
+        // Team Schedule sheet
+        const teamData = scheduleResult.teamWorkload.map(tw => ({
+            'Team': tw.team.id,
+            'Department': tw.team.department,
+            'Shift': tw.team.shift,
+            'Operations': tw.count,
+            'First Flight': tw.operations[0] ? tw.operations[0].time : '',
+            'Last Flight': tw.operations[tw.operations.length - 1] ? tw.operations[tw.operations.length - 1].time : ''
+        }));
+        const teamSheet = XLSX.utils.json_to_sheet(teamData);
+        XLSX.utils.book_append_sheet(wb, teamSheet, 'Team Schedule');
+
+        // Flight Assignments sheet
+        const flightData = scheduleResult.assignments.map(a => ({
+            'Flight': a.flight.flight,
+            'Destination': a.flight.destination,
+            'Departure Time': a.flight.time,
+            'Type': a.flight.type,
+            'Team': a.team,
+            'Gate': a.flight.gate,
+            'Passengers': a.flight.passengers,
+            'Arrival Flight': a.flight.arrivalFlight,
+            'Arrival Time': a.flight.arrivalTime
+        }));
+        const flightSheet = XLSX.utils.json_to_sheet(flightData);
+        XLSX.utils.book_append_sheet(wb, flightSheet, 'Flight Assignments');
+
+        // Unassigned sheet
+        if (scheduleResult.unassigned.length > 0) {
+            const unassignedData = scheduleResult.unassigned.map(u => ({
+                'Flight': u.flight.flight,
+                'Destination': u.flight.destination,
+                'Departure Time': u.flight.time,
+                'Type': u.flight.type,
+                'Reason': u.reason
+            }));
+            const unassignedSheet = XLSX.utils.json_to_sheet(unassignedData);
+            XLSX.utils.book_append_sheet(wb, unassignedSheet, 'Unassigned');
+        }
+
+        // Save file
+        const date = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `PHL_Schedule_${date}.xlsx`);
+    }
+</script>
+```
+
 </body>
 </html>
