@@ -328,108 +328,6 @@
         background: linear-gradient(90deg, #28a745 0%, #20c997 50%, #ffc107 80%, #dc3545 100%);
         transition: width 0.3s;
     }
-    
-    .ai-chat-container {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 15px;
-    }
-    
-    .ai-info-box {
-        background: white;
-        border-left: 4px solid #667eea;
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    
-    .ai-info-box ul {
-        color: #495057;
-        font-size: 0.95em;
-    }
-    
-    .chat-messages {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        min-height: 200px;
-        max-height: 400px;
-        overflow-y: auto;
-        margin-bottom: 15px;
-        border: 1px solid #e9ecef;
-    }
-    
-    .chat-message {
-        margin-bottom: 15px;
-        padding: 12px 15px;
-        border-radius: 8px;
-        animation: slideIn 0.3s ease-out;
-    }
-    
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .chat-message.user {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        margin-left: 20%;
-        text-align: right;
-    }
-    
-    .chat-message.assistant {
-        background: #e9ecef;
-        color: #2a5298;
-        margin-right: 20%;
-    }
-    
-    .chat-message.success {
-        background: #d4edda;
-        border-left: 4px solid #28a745;
-        color: #155724;
-    }
-    
-    .chat-message.error {
-        background: #f8d7da;
-        border-left: 4px solid #dc3545;
-        color: #721c24;
-    }
-    
-    .chat-input-container {
-        display: flex;
-        gap: 10px;
-        align-items: flex-end;
-    }
-    
-    .chat-input-container textarea {
-        flex: 1;
-        padding: 12px 15px;
-        border: 2px solid #cbd5e0;
-        border-radius: 8px;
-        font-size: 1em;
-        font-family: inherit;
-        resize: none;
-        transition: border-color 0.3s;
-    }
-    
-    .chat-input-container textarea:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-    
-    .chat-input-container button {
-        white-space: nowrap;
-        height: fit-content;
-    }
 
     @media (max-width: 768px) {
         .header h1 {
@@ -464,6 +362,19 @@
     <div class="content">
         <div class="upload-section">
             <h2>📁 Upload Schedule Files</h2>
+            
+            <div class="file-upload-group">
+                <label for="dayOfWeek">Select Day of Week to Schedule</label>
+                <select id="dayOfWeek" style="width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 6px; font-size: 1em; background: white;">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday" selected>Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
             
             <div class="file-upload-group">
                 <label for="ftAgents">Full-Time Agents Schedule (CSV)</label>
@@ -561,33 +472,6 @@
                     </table>
                 </div>
             </div>
-
-            <div id="aiAssistantSection" style="display: none; margin-top: 40px;">
-                <h2 class="section-title">🤖 AI Schedule Assistant</h2>
-                <div class="ai-chat-container">
-                    <div class="ai-info-box">
-                        <p><strong>Ask me to modify your schedule!</strong> Examples:</p>
-                        <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                            <li>"Move flight 1622 from TM204 to TM205"</li>
-                            <li>"Reassign all flights from TM210 to TM211"</li>
-                            <li>"Balance the workload between teams"</li>
-                            <li>"Show me which teams are overloaded"</li>
-                            <li>"Assign unassigned flight 2213 to TM215"</li>
-                        </ul>
-                    </div>
-                    <div id="chatMessages" class="chat-messages"></div>
-                    <div class="chat-input-container">
-                        <textarea 
-                            id="chatInput" 
-                            placeholder="Ask me to change the schedule... (e.g., 'Move flight 1622 to TM205')"
-                            rows="2"
-                        ></textarea>
-                        <button class="btn-primary" id="sendChatBtn" onclick="sendChatMessage()">
-                            ✨ Send Request
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -665,7 +549,6 @@
                 displayResults(scheduleResult);
                 document.getElementById('loading').classList.remove('active');
                 document.getElementById('results').style.display = 'block';
-                document.getElementById('aiAssistantSection').style.display = 'block';
                 document.getElementById('exportBtn').disabled = false;
             } catch (error) {
                 alert('Error generating schedule: ' + error.message);
@@ -677,21 +560,40 @@
     function createSchedule() {
         console.log('=== Starting Schedule Generation ===');
         
-        // Get Thursday schedules
-        const dayOfWeek = 'Thursday';
+        // Get selected day of week
+        const dayOfWeek = document.getElementById('dayOfWeek').value;
+        console.log(`Scheduling for: ${dayOfWeek}`);
+        
         const teams = extractTeams(ftAgentsData, ptAgentsData, dayOfWeek);
         console.log(`Teams extracted: ${teams.length}`);
+        
+        if (teams.length === 0) {
+            throw new Error(`No teams found for ${dayOfWeek}. Check that your agent CSV files have ${dayOfWeek} data.`);
+        }
+        
+        // Log team shift distribution
+        const shiftDistribution = {};
+        teams.forEach(team => {
+            const hour = Math.floor(team.startMinutes / 60);
+            shiftDistribution[hour] = (shiftDistribution[hour] || 0) + 1;
+        });
+        console.log('Team shift distribution:', shiftDistribution);
         
         const flights = processFlights(flightsData);
         console.log(`Flights processed: ${flights.length}`);
         
-        if (teams.length === 0) {
-            throw new Error('No teams found for Thursday. Check that your agent CSV files have Thursday data.');
-        }
-        
         if (flights.length === 0) {
             throw new Error('No valid flights found. Check that your flight CSV has departure times.');
         }
+
+        // Analyze flight timing distribution
+        const flightsByHour = {};
+        flights.forEach(f => {
+            const hour = Math.floor(f.timeMinutes / 60);
+            if (!flightsByHour[hour]) flightsByHour[hour] = [];
+            flightsByHour[hour].push(f);
+        });
+        console.log('Flights by hour:', Object.keys(flightsByHour).sort().map(h => `${h}:00=${flightsByHour[h].length}`).join(', '));
 
         // Phase-based assignment
         const assignments = [];
@@ -708,11 +610,10 @@
 
         console.log('Starting phase-based assignment...');
 
-        // **PHASE 0: Mark first 2-3 domestic flights as "Overnight Serviced"**
-        // These are serviced by previous day's overnight teams (not scheduled today)
+        // **PHASE 0: Mark first 3 earliest domestic flights as "Overnight Serviced"**
         const veryEarlyDomestic = flights
-            .filter(f => f.type === 'Domestic' && f.timeMinutes < 420) // Before 7am
-            .slice(0, 3); // Take first 3
+            .filter(f => f.type === 'Domestic' && f.timeMinutes < 420)
+            .slice(0, 3);
         
         console.log(`Phase 0 - Overnight Serviced: ${veryEarlyDomestic.length} flights`);
         veryEarlyDomestic.forEach(flight => {
@@ -721,64 +622,86 @@
                 team: 'OVERNIGHT',
                 phase: 'overnight_serviced'
             });
-            console.log(`✓ ${flight.flight} (${flight.time}) → OVERNIGHT (previous day team)`);
+            console.log(`✓ ${flight.flight} (${flight.time}) → OVERNIGHT`);
         });
 
-        // Phase 1: Early domestic flights (before 07:00) - excluding overnight serviced
+        // **PHASE 1: Early domestic flights (before 07:00) - PRIORITIZE COVERAGE**
         const earlyDomestic = flights.filter(f => 
             f.type === 'Domestic' && 
             f.timeMinutes < 420 &&
-            !assignments.some(a => a.flight === f) // Not already assigned
+            !assignments.some(a => a.flight === f)
         );
         console.log(`Phase 1 - Early Domestic: ${earlyDomestic.length} flights`);
-        assignFlights(earlyDomestic, teams, assignments, unassigned, teamWorkload, 'early_domestic');
+        assignFlightsFlexible(earlyDomestic, teams, assignments, unassigned, teamWorkload, 'early_domestic');
 
-        // Phase 2: Morning international bank (07:00-10:00)
+        // **PHASE 2: Morning international bank (07:00-10:00)**
         const morningIntl = flights.filter(f => 
             (f.type === 'International' || f.type === 'Precleared') && 
             f.timeMinutes >= 420 && f.timeMinutes < 600 &&
             !assignments.some(a => a.flight === f)
         );
         console.log(`Phase 2 - Morning International: ${morningIntl.length} flights`);
-        assignFlights(morningIntl, teams, assignments, unassigned, teamWorkload, 'morning_intl');
+        assignFlightsFlexible(morningIntl, teams, assignments, unassigned, teamWorkload, 'morning_intl');
 
-        // Phase 3: Mid-day domestic (07:00-18:00)
+        // **PHASE 3: Mid-day domestic (07:00-18:00)**
         const middayDomestic = flights.filter(f => 
             f.type === 'Domestic' && 
             f.timeMinutes >= 420 && f.timeMinutes < 1080 &&
             !assignments.some(a => a.flight === f)
         );
         console.log(`Phase 3 - Midday Domestic: ${middayDomestic.length} flights`);
-        assignFlights(middayDomestic, teams, assignments, unassigned, teamWorkload, 'midday_domestic');
+        assignFlightsFlexible(middayDomestic, teams, assignments, unassigned, teamWorkload, 'midday_domestic');
 
-        // Phase 4: Evening international bank (18:00-22:00)
+        // **PHASE 4: Evening international bank (18:00-22:00)**
         const eveningIntl = flights.filter(f => 
             (f.type === 'International' || f.type === 'Precleared') && 
             f.timeMinutes >= 1080 && f.timeMinutes < 1320 &&
             !assignments.some(a => a.flight === f)
         );
         console.log(`Phase 4 - Evening International: ${eveningIntl.length} flights`);
-        assignFlights(eveningIntl, teams, assignments, unassigned, teamWorkload, 'evening_intl');
+        assignFlightsFlexible(eveningIntl, teams, assignments, unassigned, teamWorkload, 'evening_intl');
 
-        // Phase 5: Late domestic (after 18:00)
+        // **PHASE 5: Late domestic (after 18:00)**
         const lateDomestic = flights.filter(f => 
             f.type === 'Domestic' && 
             f.timeMinutes >= 1080 &&
             !assignments.some(a => a.flight === f)
         );
         console.log(`Phase 5 - Late Domestic: ${lateDomestic.length} flights`);
-        assignFlights(lateDomestic, teams, assignments, unassigned, teamWorkload, 'late_domestic');
+        assignFlightsFlexible(lateDomestic, teams, assignments, unassigned, teamWorkload, 'late_domestic');
+
+        // **PHASE 6: Final sweep - try to assign remaining with relaxed constraints**
+        const stillUnassigned = flights.filter(f => 
+            !assignments.some(a => a.flight === f)
+        );
+        if (stillUnassigned.length > 0) {
+            console.log(`Phase 6 - Final Sweep: ${stillUnassigned.length} flights remaining`);
+            assignFlightsVeryFlexible(stillUnassigned, teams, assignments, unassigned, teamWorkload, 'final_sweep');
+        }
 
         console.log(`=== Schedule Complete ===`);
         console.log(`Assigned: ${assignments.length}, Unassigned: ${unassigned.length}`);
-        console.log(`Overnight serviced: ${veryEarlyDomestic.length} flights`);
+        console.log(`Coverage: ${Math.round((assignments.length / flights.length) * 100)}%`);
+
+        // Analyze coverage gaps
+        const unassignedByTime = {};
+        unassigned.forEach(u => {
+            const hour = Math.floor(u.flight.timeMinutes / 60);
+            if (!unassignedByTime[hour]) unassignedByTime[hour] = [];
+            unassignedByTime[hour].push(u.flight.flight);
+        });
+        if (Object.keys(unassignedByTime).length > 0) {
+            console.log('Coverage gaps by hour:', unassignedByTime);
+        }
 
         return {
             assignments,
             unassigned,
             teamWorkload: Object.values(teamWorkload),
             stats: calculateStats(assignments, unassigned, teams),
-            overnightCount: veryEarlyDomestic.length
+            overnightCount: veryEarlyDomestic.length,
+            dayOfWeek: dayOfWeek,
+            coverageGaps: unassignedByTime
         };
     }
 
@@ -962,6 +885,126 @@
         
         console.log(`Phase complete: ${flights.filter((f, i) => assignments.some(a => a.flight === f)).length} assigned, ${flights.filter((f, i) => unassigned.some(u => u.flight === f)).length} unassigned`);
     }
+    
+    // More flexible assignment - reduces time gaps and increases workload limits
+    function assignFlightsFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        flights.forEach((flight, index) => {
+            let assigned = false;
+            let bestTeam = null;
+            let minWorkload = Infinity;
+
+            for (let team of teams) {
+                const workload = teamWorkload[team.id];
+                
+                if (canAssignFlightFlexible(team, flight, workload)) {
+                    if (workload.count < minWorkload) {
+                        minWorkload = workload.count;
+                        bestTeam = team;
+                    }
+                }
+            }
+
+            if (bestTeam) {
+                const workload = teamWorkload[bestTeam.id];
+                assignments.push({
+                    flight: flight,
+                    team: bestTeam.id,
+                    phase: phase
+                });
+                workload.operations.push(flight);
+                workload.count++;
+                assigned = true;
+            } else {
+                // Don't add to unassigned yet - let other phases try
+            }
+        });
+    }
+    
+    // Very flexible assignment for final sweep - maximum coverage
+    function assignFlightsVeryFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        flights.forEach((flight, index) => {
+            let assigned = false;
+            let bestTeam = null;
+            let minWorkload = Infinity;
+
+            for (let team of teams) {
+                const workload = teamWorkload[team.id];
+                
+                if (canAssignFlightVeryFlexible(team, flight, workload)) {
+                    if (workload.count < minWorkload) {
+                        minWorkload = workload.count;
+                        bestTeam = team;
+                    }
+                }
+            }
+
+            if (bestTeam) {
+                const workload = teamWorkload[bestTeam.id];
+                assignments.push({
+                    flight: flight,
+                    team: bestTeam.id,
+                    phase: phase
+                });
+                workload.operations.push(flight);
+                workload.count++;
+                assigned = true;
+                console.log(`✓ Final sweep: ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
+            } else {
+                unassigned.push({
+                    flight: flight,
+                    reason: 'No team available even with relaxed constraints'
+                });
+                console.log(`✗ Cannot assign: ${flight.flight} (${flight.time})`);
+            }
+        });
+    }
+    
+    function canAssignFlightFlexible(team, flight, workload) {
+        // More lenient version for better coverage
+        const teamReadyTime = team.startMinutes - 30; // Allow 30 min early
+        if (flight.timeMinutes < teamReadyTime) return false;
+        
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        const maxTime = shiftEnd + 180; // Allow 3 hours overtime
+        if (flight.timeMinutes > maxTime) return false;
+
+        if (workload.count >= 10) return false; // Higher limit
+
+        if (workload.operations.length > 0) {
+            const lastOp = workload.operations[workload.operations.length - 1];
+            const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
+            
+            if (timeSinceLastOp < 25) return false; // Reduced gap
+            
+            if (flight.type === 'International' || flight.type === 'Precleared') {
+                if (lastOp.type === 'Domestic' && timeSinceLastOp < 50) return false;
+                if ((lastOp.type === 'International' || lastOp.type === 'Precleared') && timeSinceLastOp < 75) return false;
+            }
+        }
+
+        return true;
+    }
+    
+    function canAssignFlightVeryFlexible(team, flight, workload) {
+        // Maximally lenient for final sweep
+        const teamReadyTime = team.startMinutes - 45; // Very early start OK
+        if (flight.timeMinutes < teamReadyTime) return false;
+        
+        const shiftEnd = team.startMinutes + (8.5 * 60);
+        const maxTime = shiftEnd + 240; // Allow 4 hours overtime if needed
+        if (flight.timeMinutes > maxTime) return false;
+
+        if (workload.count >= 12) return false; // Maximum operations
+
+        if (workload.operations.length > 0) {
+            const lastOp = workload.operations[workload.operations.length - 1];
+            const timeSinceLastOp = flight.timeMinutes - lastOp.timeMinutes;
+            
+            if (timeSinceLastOp < 20) return false; // Minimum 20 min
+        }
+
+        return true;
+    }
 
     function canAssignFlight(team, flight, workload) {
         // Check if team has started (allow 15 minutes before shift for early prep)
@@ -1100,16 +1143,20 @@
 
     // Display results
     function displayResults(result) {
-        // Display stats
+        // Display header with day of week
         const statsGrid = document.getElementById('statsGrid');
         statsGrid.innerHTML = `
+            <div class="stat-card" style="grid-column: span 2; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h3 style="color: rgba(255,255,255,0.9);">Scheduling Day</h3>
+                <div class="value" style="color: white;">${result.dayOfWeek}</div>
+            </div>
             <div class="stat-card">
                 <h3>Total Flights</h3>
                 <div class="value">${result.stats.totalFlights}</div>
             </div>
             <div class="stat-card">
                 <h3>Assigned</h3>
-                <div class="value">${result.stats.assigned}</div>
+                <div class="value" style="color: #28a745;">${result.stats.assigned}</div>
             </div>
             <div class="stat-card">
                 <h3>Coverage</h3>
@@ -1127,7 +1174,23 @@
                 <h3>Teams Deployed</h3>
                 <div class="value">${result.stats.teamsDeployed}</div>
             </div>
+            <div class="stat-card">
+                <h3>Avg per Team</h3>
+                <div class="value">${(result.stats.assigned / result.stats.teamsDeployed).toFixed(1)}</div>
+            </div>
         `;
+        
+        // Show coverage gap alert if exists
+        if (result.coverageGaps && Object.keys(result.coverageGaps).length > 0) {
+            const gapHours = Object.keys(result.coverageGaps).sort((a,b) => a-b);
+            const gapSummary = gapHours.map(h => `${h}:00 (${result.coverageGaps[h].length})`).join(', ');
+            statsGrid.innerHTML += `
+                <div class="stat-card" style="grid-column: span 4; background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h3 style="color: #856404;">Coverage Gaps by Hour</h3>
+                    <div style="font-size: 0.9em; color: #856404; margin-top: 8px;">${gapSummary}</div>
+                </div>
+            `;
+        }
 
         // Display team workload
         const teamTableBody = document.getElementById('teamTableBody');
@@ -1136,6 +1199,14 @@
             const firstFlight = tw.operations[0];
             const lastFlight = tw.operations[tw.operations.length - 1];
             const flightNumbers = tw.operations.map(op => op.flight).join(', ');
+            
+            // Calculate shift utilization
+            const shiftStart = tw.team.startMinutes;
+            const shiftEnd = shiftStart + (8.5 * 60);
+            const actualStart = firstFlight ? firstFlight.timeMinutes : shiftStart;
+            const actualEnd = lastFlight ? lastFlight.timeMinutes : shiftStart;
+            const utilization = tw.count > 0 ? Math.round(((actualEnd - actualStart) / (8.5 * 60)) * 100) : 0;
+            
             const row = `
                 <tr>
                     <td><strong>${tw.team.id}</strong></td>
@@ -1146,7 +1217,7 @@
                             <div class="workload-fill" style="width: ${(tw.count / 6) * 100}%"></div>
                         </div>
                     </td>
-                    <td style="font-size: 0.85em;">${flightNumbers || '-'}</td>
+                    <td style="font-size: 0.85em; max-width: 300px; overflow-x: auto;">${flightNumbers || '-'}</td>
                     <td>${firstFlight ? firstFlight.time : '-'}</td>
                     <td>${lastFlight ? lastFlight.time : '-'}</td>
                 </tr>
