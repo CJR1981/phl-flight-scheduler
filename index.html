@@ -803,6 +803,9 @@
             const unassigned = [];
             const teamWorkload = {};
 
+            // OPTIMIZATION: Use Set for O(1) lookup instead of O(n) .some() on assignments array
+            const assignedFlights = new Set();
+
             teams.forEach(team => {
                 teamWorkload[team.id] = {
                     team: team,
@@ -815,18 +818,18 @@
             console.log('Starting phase-based assignment...');
 
             // **PHASE 1: Early Short Turns (STD < 07:00) - HIGHEST PRIORITY**
-            const earlyShortTurns = flights.filter(f => 
-                f.operationType === 'ShortTurn' && 
+            const earlyShortTurns = flights.filter(f =>
+                f.operationType === 'ShortTurn' &&
                 f.timeMinutes < 420 &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             console.log(`Phase 1 - Early Short Turns: ${earlyShortTurns.length} flights`);
-            assignFlightsFlexible(earlyShortTurns, teams, assignments, unassigned, teamWorkload, 'early_short_turns');
-            
+            assignFlightsFlexible(earlyShortTurns, teams, assignments, unassigned, teamWorkload, assignedFlights, 'early_short_turns');
+
             // **PHASE 1B: PRIORITY INTERNATIONAL - Assign ALL international flights FIRST**
-            const allInternational = flights.filter(f => 
+            const allInternational = flights.filter(f =>
                 (f.type === 'International' || f.type === 'Precleared') &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             
             if (allInternational.length > 0) {
@@ -894,8 +897,9 @@
                             team: bestTeam.id,
                             phase: 'priority_international'
                         });
+                        assignedFlights.add(flight); // OPTIMIZATION: Track in Set for O(1) lookup
                         workload.operations.push(flight);
-                        workload.operations.sort((a, b) => a.timeMinutes - b.timeMinutes);
+                        // OPTIMIZATION: Don't sort here - will sort once at the end
                         workload.count++;
                         console.log(`✓ PRIORITY INTL: ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
                     }
@@ -903,51 +907,51 @@
             }
 
             // **PHASE 2: Early Overnight domestic (before 07:00)**
-            const earlyOvernights = flights.filter(f => 
+            const earlyOvernights = flights.filter(f =>
                 f.operationType === 'Overnight' &&
-                f.type === 'Domestic' && 
+                f.type === 'Domestic' &&
                 f.timeMinutes < 420 &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             console.log(`Phase 2 - Early Overnights: ${earlyOvernights.length} flights`);
-            assignFlightsFlexible(earlyOvernights, teams, assignments, unassigned, teamWorkload, 'early_overnights');
+            assignFlightsFlexible(earlyOvernights, teams, assignments, unassigned, teamWorkload, assignedFlights, 'early_overnights');
 
             // **PHASE 3: Mid-day Short Turns (07:00-18:00)**
-            const middayShortTurns = flights.filter(f => 
+            const middayShortTurns = flights.filter(f =>
                 f.operationType === 'ShortTurn' &&
                 f.timeMinutes >= 420 && f.timeMinutes < 1080 &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             console.log(`Phase 3 - Midday Short Turns: ${middayShortTurns.length} flights`);
-            assignFlightsFlexible(middayShortTurns, teams, assignments, unassigned, teamWorkload, 'midday_short_turns');
+            assignFlightsFlexible(middayShortTurns, teams, assignments, unassigned, teamWorkload, assignedFlights, 'midday_short_turns');
 
             // **PHASE 4: Mid-day Overnight/Long Turn domestic (07:00-18:00)**
-            const middayOther = flights.filter(f => 
+            const middayOther = flights.filter(f =>
                 (f.operationType === 'Overnight' || f.operationType === 'LongTurn') &&
-                f.type === 'Domestic' && 
+                f.type === 'Domestic' &&
                 f.timeMinutes >= 420 && f.timeMinutes < 1080 &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             console.log(`Phase 4 - Midday Overnight/LongTurn: ${middayOther.length} flights`);
-            assignFlightsFlexible(middayOther, teams, assignments, unassigned, teamWorkload, 'midday_other');
+            assignFlightsFlexible(middayOther, teams, assignments, unassigned, teamWorkload, assignedFlights, 'midday_other');
 
             // **PHASE 6: Late Short Turns (after 18:00)**
-            const lateShortTurns = flights.filter(f => 
+            const lateShortTurns = flights.filter(f =>
                 f.operationType === 'ShortTurn' &&
                 f.timeMinutes >= 1080 &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             console.log(`Phase 6 - Late Short Turns: ${lateShortTurns.length} flights`);
-            assignFlightsFlexible(lateShortTurns, teams, assignments, unassigned, teamWorkload, 'late_short_turns');
+            assignFlightsFlexible(lateShortTurns, teams, assignments, unassigned, teamWorkload, assignedFlights, 'late_short_turns');
 
             // **PHASE 7: Late Overnight/Long Turn (after 18:00)**
-            const lateOther = flights.filter(f => 
+            const lateOther = flights.filter(f =>
                 (f.operationType === 'Overnight' || f.operationType === 'LongTurn') &&
                 f.timeMinutes >= 1080 &&
-                !assignments.some(a => a.flight === f)
+                !assignedFlights.has(f)
             );
             console.log(`Phase 7 - Late Overnight/LongTurn: ${lateOther.length} flights`);
-            assignFlightsFlexible(lateOther, teams, assignments, unassigned, teamWorkload, 'late_other');
+            assignFlightsFlexible(lateOther, teams, assignments, unassigned, teamWorkload, assignedFlights, 'late_other');
 
             // **PHASE 9: Terminators (flexible timing - optimize for coverage)**
             // **PHASE 9: AGGRESSIVE GAP FILLING - Maximize team utilization**
@@ -957,8 +961,8 @@
             
             if (underutilized.length > 0) {
                 console.log(`\n🔍 PHASE 9 - AGGRESSIVE GAP FILLING: ${underutilized.length} underutilized FT teams`);
-                
-                const unassignedForGapFill = flights.filter(f => !assignments.some(a => a.flight === f));
+
+                const unassignedForGapFill = flights.filter(f => !assignedFlights.has(f));
                 
                 // Process each unassigned flight
                 unassignedForGapFill.forEach(flight => {
@@ -1068,9 +1072,10 @@
                             team: bestTeam.team.id,
                             phase: 'aggressive_gap_fill'
                         });
-                        // Insert in proper time order
+                        assignedFlights.add(flight); // OPTIMIZATION: Track in Set for O(1) lookup
+                        // Add to operations (will sort all at once later)
                         bestTeam.operations.push(flight);
-                        bestTeam.operations.sort((a, b) => a.timeMinutes - b.timeMinutes);
+                        // OPTIMIZATION: Don't sort here - will sort once at the end
                         bestTeam.count++;
                         console.log(`✓ AGG GAP FILL: ${flight.flight} (${flight.time}) → ${bestTeam.team.id} (count now: ${bestTeam.count}, score: ${bestScore})`);
                     }
@@ -1078,19 +1083,19 @@
             }
             
             // **PHASE 10: Final sweep - try to assign remaining departures with relaxed constraints**
-            const stillUnassigned = flights.filter(f => 
-                !assignments.some(a => a.flight === f)
+            const stillUnassigned = flights.filter(f =>
+                !assignedFlights.has(f)
             );
             if (stillUnassigned.length > 0) {
                 console.log(`Phase 8 - Final Sweep: ${stillUnassigned.length} departures remaining`);
-                assignFlightsVeryFlexible(stillUnassigned, teams, assignments, unassigned, teamWorkload, 'final_sweep');
+                assignFlightsVeryFlexible(stillUnassigned, teams, assignments, unassigned, teamWorkload, assignedFlights, 'final_sweep');
             }
 
             // TERMINATORS SKIPPED - Focus on 100% departure coverage first
-            
+
             // **PHASE 11: AGGRESSIVE REBALANCING - Utilize idle teams**
             const currentlyIdle = Object.values(teamWorkload).filter(tw => tw.count === 0);
-            const remainingUnassigned = flights.filter(f => !assignments.some(a => a.flight === f));
+            const remainingUnassigned = flights.filter(f => !assignedFlights.has(f));
             
             if (currentlyIdle.length > 0 && remainingUnassigned.length > 0) {
                 console.log(`\n⚠️ PHASE 11 - AGGRESSIVE REBALANCING: ${currentlyIdle.length} idle teams, ${remainingUnassigned.length} unassigned`);
@@ -1113,6 +1118,7 @@
                                     team: team.id,
                                     phase: 'aggressive_rebalance'
                                 });
+                                assignedFlights.add(flight); // OPTIMIZATION: Track in Set for O(1) lookup
                                 tw.operations.push(flight);
                                 tw.count++;
                                 console.log(`✓ AGGRESSIVE: ${flight.flight} (${flight.time}) → ${team.id} (was idle)`);
@@ -1127,42 +1133,57 @@
             const finallyIdle = Object.values(teamWorkload).filter(tw => tw.count === 0);
             if (finallyIdle.length > 0) {
                 console.log(`\n⚠️ PHASE 12 - WORKLOAD STEALING: ${finallyIdle.length} idle teams remain`);
-                
+
+                // OPTIMIZATION: Create assignment Map for O(1) lookup instead of O(n) findIndex
+                const assignmentMap = new Map();
+                assignments.forEach((assignment, index) => {
+                    // Create unique key from flight and team
+                    const key = `${assignment.flight.flight}_${assignment.flight.timeMinutes}_${assignment.team}`;
+                    assignmentMap.set(key, index);
+                });
+
                 // Find overloaded teams (more than 5 ops for FT, 4 for PT)
-                const overloaded = Object.values(teamWorkload).filter(tw => 
+                const overloaded = Object.values(teamWorkload).filter(tw =>
                     tw.count > (tw.team.type === 'PT' ? 4 : 5)
                 );
-                
+
                 overloaded.forEach(overloadedTW => {
                     // Try to move some of their operations to idle teams
                     for (let i = overloadedTW.operations.length - 1; i >= 0 && finallyIdle.length > 0; i--) {
                         const op = overloadedTW.operations[i];
-                        
+
                         // Try to assign this operation to an idle team
                         for (let idleTW of finallyIdle) {
                             if (canTeamReachFlight(idleTW.team, op)) {
                                 const shiftEnd = idleTW.team.startMinutes + (8.5 * 60);
                                 const serviceTime = (op.type === 'International' || op.type === 'Precleared') ? 60 : 40;
                                 const finishTime = op.timeMinutes + serviceTime + 30;
-                                
+
                                 if (finishTime <= shiftEnd) {
-                                    // Find and update the assignment
-                                    const assignmentIndex = assignments.findIndex(a => 
-                                        a.flight === op && a.team === overloadedTW.team.id
-                                    );
+                                    // OPTIMIZATION: Use Map for O(1) lookup instead of findIndex O(n)
+                                    const key = `${op.flight}_${op.timeMinutes}_${overloadedTW.team.id}`;
+                                    const assignmentIndex = assignmentMap.get(key);
                                     
-                                    if (assignmentIndex >= 0) {
+                                    if (assignmentIndex !== undefined) {
+                                        // Update assignment
+                                        const oldKey = key;
+                                        const newKey = `${op.flight}_${op.timeMinutes}_${idleTW.team.id}`;
+
                                         assignments[assignmentIndex].team = idleTW.team.id;
                                         assignments[assignmentIndex].phase = 'workload_steal';
-                                        
+
+                                        // OPTIMIZATION: Update the Map index
+                                        assignmentMap.delete(oldKey);
+                                        assignmentMap.set(newKey, assignmentIndex);
+
                                         // Update workloads
                                         overloadedTW.operations.splice(i, 1);
                                         overloadedTW.count--;
                                         idleTW.operations.push(op);
                                         idleTW.count++;
-                                        
+
                                         console.log(`✓ STEAL: ${op.flight} moved from ${overloadedTW.team.id} (${overloadedTW.count+1}) to ${idleTW.team.id} (idle→1)`);
-                                        
+
                                         // Remove from idle list if no longer idle
                                         const idleIndex = finallyIdle.indexOf(idleTW);
                                         if (idleIndex >= 0) finallyIdle.splice(idleIndex, 1);
@@ -1175,19 +1196,27 @@
                 });
             }
 
+            // OPTIMIZATION: Sort all team operations once at the end instead of multiple times during assignment
+            console.log('\n🔧 Sorting all team operations by time...');
+            Object.values(teamWorkload).forEach(tw => {
+                if (tw.operations.length > 1) {
+                    tw.operations.sort((a, b) => a.timeMinutes - b.timeMinutes);
+                }
+            });
+
             console.log(`\n=== FINAL SCHEDULE SUMMARY ===`);
             console.log(`Total Operations: ${flights.length + terminators.length}`);
             console.log(`Assigned: ${assignments.length}`);
             console.log(`Unassigned: ${unassigned.length}`);
             console.log(`Coverage: ${Math.round((assignments.length / (flights.length + terminators.length)) * 100)}%`);
-            
+
             // Assignment breakdown by phase
             const phaseBreakdown = {};
             assignments.forEach(a => {
                 phaseBreakdown[a.phase] = (phaseBreakdown[a.phase] || 0) + 1;
             });
             console.log('\nAssignments by phase:', phaseBreakdown);
-            
+
             // DETAILED FAILURE ANALYSIS
             if (unassigned.length > 0) {
                 console.log(`\n❌ === WHY WE FAILED TO REACH 100% (${unassigned.length} unassigned) ===`);
@@ -1276,12 +1305,12 @@
             // **VALIDATION: Check for buffer violations**
             console.log('\n🔍 VALIDATING BUFFER REQUIREMENTS...');
             const bufferViolations = [];
-            
+
             Object.values(teamWorkload).forEach(tw => {
                 if (tw.operations.length < 2) return;
-                
-                // Sort operations by time
-                const ops = [...tw.operations].sort((a, b) => a.timeMinutes - b.timeMinutes);
+
+                // OPTIMIZATION: Operations are already sorted above, no need to sort again
+                const ops = tw.operations;
                 
                 for (let i = 1; i < ops.length; i++) {
                     const prevOp = ops[i-1];
@@ -1356,8 +1385,9 @@
         
         function assignTerminators(terminators, teams, assignments, unassigned, teamWorkload, phase) {
             console.log(`\n--- Assigning ${terminators.length} terminator strips ---`);
-            
-            // Sort terminators by arrival time
+
+            // OPTIMIZATION: Terminators are already sorted by processFlights, but we keep this for safety
+            // This sort is minimal cost since we create a copy anyway
             const sortedTerminators = [...terminators].sort((a, b) => a.timeMinutes - b.timeMinutes);
             
             sortedTerminators.forEach((terminator, index) => {
@@ -1456,18 +1486,9 @@
         }
 
         function getTeamTimeWindow(team) {
-            // Determine which time window this team can effectively cover
-            const shiftStart = team.startMinutes;
-            const shiftEnd = shiftStart + (8.5 * 60);
-            const firstAvailable = shiftStart + 60; // After prep time
-            const lastAvailable = shiftEnd - 70; // Before service + return
-            
-            return {
-                start: firstAvailable,
-                end: lastAvailable,
-                startTime: minutesToTime(firstAvailable),
-                endTime: minutesToTime(lastAvailable)
-            };
+            // OPTIMIZATION: Return cached time window instead of recalculating
+            // The time window is now pre-computed during team extraction
+            return team.timeWindow;
         }
         
         function canTeamReachFlight(team, flight) {
@@ -1525,7 +1546,12 @@
                 if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
                     const startTime = shift.split('-')[0];
                     const startMinutes = timeToMinutes(startTime);
-                    
+
+                    // OPTIMIZATION: Pre-compute time window to avoid repeated calculations
+                    const shiftEnd = startMinutes + (8.5 * 60);
+                    const firstAvailable = startMinutes + 60;
+                    const lastAvailable = shiftEnd - 70;
+
                     teams.push({
                         id: team,
                         department: dept,
@@ -1533,7 +1559,14 @@
                         startMinutes: startMinutes,
                         type: 'FT',
                         name: `${agent['First Name']} ${agent['Last Name']}`,
-                        specialization: 'mixed' // Default: can do both domestic and international
+                        specialization: 'mixed', // Default: can do both domestic and international
+                        // OPTIMIZATION: Cached time window for O(1) access
+                        timeWindow: {
+                            start: firstAvailable,
+                            end: lastAvailable,
+                            startTime: minutesToTime(firstAvailable),
+                            endTime: minutesToTime(lastAvailable)
+                        }
                     });
                 }
             });
@@ -1547,7 +1580,12 @@
                 if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
                     const startTime = shift.split('-')[0];
                     const startMinutes = timeToMinutes(startTime);
-                    
+
+                    // OPTIMIZATION: Pre-compute time window to avoid repeated calculations
+                    const shiftEnd = startMinutes + (8.5 * 60);
+                    const firstAvailable = startMinutes + 60;
+                    const lastAvailable = shiftEnd - 70;
+
                     teams.push({
                         id: team,
                         department: dept,
@@ -1555,7 +1593,14 @@
                         startMinutes: startMinutes,
                         type: 'PT',
                         name: `${agent['First Name']} ${agent['Last Name']}`,
-                        specialization: 'mixed' // Default: can do both
+                        specialization: 'mixed', // Default: can do both
+                        // OPTIMIZATION: Cached time window for O(1) access
+                        timeWindow: {
+                            start: firstAvailable,
+                            end: lastAvailable,
+                            startTime: minutesToTime(firstAvailable),
+                            endTime: minutesToTime(lastAvailable)
+                        }
                     });
                 }
             });
@@ -1757,19 +1802,19 @@
             console.log(`Phase complete: ${flights.filter((f, i) => assignments.some(a => a.flight === f)).length} assigned, ${flights.filter((f, i) => unassigned.some(u => u.flight === f)).length} unassigned`);
         }
         
-        function assignFlightsFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        function assignFlightsFlexible(flights, teams, assignments, unassigned, teamWorkload, assignedFlights, phase) {
             console.log(`\n=== Phase ${phase}: Attempting ${flights.length} flights ===`);
             let phaseAssigned = 0;
-            
+
             flights.forEach((flight, index) => {
                 let assigned = false;
                 let bestTeam = null;
                 let minWorkload = Infinity;
                 let rejectionReasons = [];
-                
+
                 // Filter teams that can realistically reach this flight based on shift timing
                 const eligibleTeams = teams.filter(team => canTeamReachFlight(team, flight));
-                
+
                 if (eligibleTeams.length === 0) {
                     console.log(`✗ ${flight.flight} (${flight.time}) - NO TEAMS IN TIME WINDOW`);
                     return; // Skip to next flight
@@ -1777,7 +1822,7 @@
 
                 for (let team of eligibleTeams) {
                     const workload = teamWorkload[team.id];
-                    
+
                     if (canAssignFlightFlexible(team, flight, workload)) {
                         if (workload.count < minWorkload) {
                             minWorkload = workload.count;
@@ -1799,17 +1844,18 @@
                         team: bestTeam.id,
                         phase: phase
                     });
+                    assignedFlights.add(flight); // OPTIMIZATION: Track in Set for O(1) lookup
                     workload.operations.push(flight);
                     workload.count++;
-                    
+
                     // Update truck load
                     workload.truckLoad.push(flight);
-                    
+
                     // Check if truck needs to return (3 domestic or 1 international)
                     if (flight.type === 'International' || flight.type === 'Precleared' || workload.truckLoad.length >= 3) {
                         workload.truckLoad = []; // Reset truck - team returns to unit
                     }
-                    
+
                     assigned = true;
                     phaseAssigned++;
                     
@@ -1913,7 +1959,7 @@
         }
         
         // Very flexible assignment for final sweep - maximum coverage
-        function assignFlightsVeryFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
+        function assignFlightsVeryFlexible(flights, teams, assignments, unassigned, teamWorkload, assignedFlights, phase) {
             flights.forEach((flight, index) => {
                 let assigned = false;
                 let bestTeam = null;
@@ -1921,7 +1967,7 @@
 
                 for (let team of teams) {
                     const workload = teamWorkload[team.id];
-                    
+
                     if (canAssignFlightVeryFlexible(team, flight, workload)) {
                         if (workload.count < minWorkload) {
                             minWorkload = workload.count;
@@ -1937,17 +1983,18 @@
                         team: bestTeam.id,
                         phase: phase
                     });
+                    assignedFlights.add(flight); // OPTIMIZATION: Track in Set for O(1) lookup
                     workload.operations.push(flight);
                     workload.count++;
-                    
+
                     // Update truck load
                     workload.truckLoad.push(flight);
-                    
+
                     // Check if truck needs to return
                     if (flight.type === 'International' || flight.type === 'Precleared' || workload.truckLoad.length >= 3) {
                         workload.truckLoad = [];
                     }
-                    
+
                     assigned = true;
                     console.log(`✓ Final sweep: ${flight.flight} (${flight.time}) → ${bestTeam.id}`);
                 } else {
