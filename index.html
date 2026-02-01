@@ -441,14 +441,14 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>âœˆï¸ PHL Flight Scheduler</h1>
+            <h1>✈️ PHL Flight Scheduler</h1>
             <p>Philadelphia International Airport - Catering Operations Scheduler</p>
         </div>
 
 ```
     <div class="content">
         <div class="upload-section">
-            <h2>ðŸ“ Daily Flight Schedule</h2>
+            <h2>Daily Flight Schedule</h2>
 
             <div class="alert alert-success" style="margin-bottom: 20px; padding: 15px; border-radius: 6px; background: #d4edda; border-left: 4px solid #28a745; color: #155724;">
                 <strong>✓ Agent Schedules Pre-Loaded</strong><br>
@@ -481,11 +481,9 @@
             </div>
 
             <div class="button-group">
-                <button class="btn-primary" id="generateBtn" disabled>
-                    ðŸš€ Generate Schedule
+                <button class="btn-primary" id="generateBtn" disabled>Generate Schedule</button>
                 </button>
-                <button class="btn-success" id="exportBtn" disabled>
-                    ðŸ“Š Export to Excel
+                <button class="btn-success" id="exportBtn" disabled>Export to Excel</button>
                 </button>
             </div>
         </div>
@@ -496,7 +494,7 @@
         </div>
 
         <div class="results-section" id="results" style="display: none;">
-            <h2 class="section-title">ðŸ“Š Schedule Summary</h2>
+            <h2 class="section-title">Schedule Summary</h2>
             <div class="stats-grid" id="statsGrid"></div>
 
             <h2 class="section-title">ðŸ‘¥ Team Assignments Summary</h2>
@@ -520,11 +518,11 @@
             <h2 class="section-title">ðŸ“‹ Detailed Team Assignments (Grouped by Team)</h2>
             <div class="alert alert-info" style="margin-bottom: 20px;">
                 <strong>Live-Schedule-Based Buffer Settings:</strong><br>
-                â€¢ All flight types: 5-10 min minimum gaps (based on Jan 22, 2026 live schedule)<br>
-                â€¢ Teams can mix domestic and international operations freely<br>
-                â€¢ Team availability: Up to 60 min before shift start<br>
-                â€¢ Overtime allowance: Up to 4 hours for maximum coverage<br>
-                â€¢ Operations per team: 4-8 (target 4-6 for balance)
+                ✓€¢ All flight types: 5-10 min minimum gaps (based on Jan 22, 2026 live schedule)<br>
+                ✓€¢ Teams can mix domestic and international operations freely<br>
+                ✓€¢ Team availability: Up to 60 min before shift start<br>
+                ✓€¢ Overtime allowance: Up to 4 hours for maximum coverage<br>
+                ✓€¢ Operations per team: 4-8 (target 4-6 for balance)
             </div>
             <div id="teamDetailedGroups"></div>
 
@@ -6786,7 +6784,7 @@ const EMBEDDED_PT_DATA = [
                 document.getElementById('ptStatus').textContent = `âœ“ Loaded ${data.length} part-time agents`;
             } else if (type === 'flights') {
                 flightsData = data;
-                document.getElementById('flightStatus').textContent = `âœ“ Loaded ${data.length} flights`;
+                document.getElementById('flightStatus').textContent = `✓ Loaded ${data.length} flights`;
             }
 
             checkReadyToGenerate();
@@ -7610,7 +7608,16 @@ const EMBEDDED_PT_DATA = [
     }
 
     // Export to Excel
-    document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+    const exportButton = document.getElementById('exportBtn');
+    if (exportButton) {
+        exportButton.addEventListener('click', function() {
+            console.log('Export button clicked via listener');
+            exportToExcel();
+        });
+        console.log('✓ Export button event listener attached successfully');
+    } else {
+        console.error('ERROR: exportBtn element not found');
+    }
     
     // Handle assignment changes
     function updateAssignment(index, newTeam) {
@@ -8048,7 +8055,21 @@ const EMBEDDED_PT_DATA = [
     window.sendChatMessage = sendChatMessage;
 
     function exportToExcel() {
-        if (!scheduleResult) return;
+        console.log('=== EXPORT TO EXCEL CLICKED ===');
+        console.log('scheduleResult exists:', !!scheduleResult);
+        console.log('XLSX library loaded:', typeof XLSX !== 'undefined');
+        
+        if (typeof XLSX === 'undefined') {
+            alert('ERROR: Excel library not loaded. Please refresh the page.');
+            console.error('XLSX library not loaded');
+            return;
+        }
+        
+        if (!scheduleResult) {
+            alert('Please generate a schedule first before exporting.');
+            console.error('No schedule result to export');
+            return;
+        }
 
         const wb = XLSX.utils.book_new();
         const dayOfWeek = scheduleResult.dayOfWeek || 'Thursday';
@@ -8250,7 +8271,46 @@ const EMBEDDED_PT_DATA = [
 
         // Save file with day of week in filename
         const date = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(wb, `PHL_Schedule_${dayOfWeek}_${date}.xlsx`);
+        const filename = `PHL_Schedule_${dayOfWeek}_${date}.xlsx`;
+        console.log('Attempting to save:', filename);
+        try {
+            XLSX.writeFile(wb, filename);
+            console.log('✓ Excel file saved successfully');
+            // Show helpful alert with file location info
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isMac = /Mac/.test(navigator.userAgent);
+            const isWindows = /Win/.test(navigator.userAgent);
+            
+            let locationMsg = '';
+            if (isIOS) {
+                locationMsg = '\n\nOn iOS: Open Files app → Browse → Downloads folder';
+            } else if (isMac) {
+                locationMsg = '\n\nOn Mac: Check Finder → Downloads folder\nOr press Cmd+Option+L';
+            } else if (isWindows) {
+                locationMsg = '\n\nOn Windows: Check File Explorer → Downloads folder\nOr press Windows+E';
+            } else {
+                locationMsg = '\n\nCheck your browser\'s Downloads folder';
+            }
+            
+            alert('✓ Excel file exported successfully!\n\nFile: ' + filename + locationMsg);
+        } catch (error) {
+            console.error('ERROR saving Excel:', error);
+            alert('Error exporting: ' + error.message);
+            return;
+        }
+        
+        // Show success banner on page
+        const successBanner = document.createElement('div');
+        successBanner.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #28a745; color: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; font-size: 16px; text-align: center;';
+        successBanner.innerHTML = '<strong>✓ Excel File Downloaded!</strong><br><small>Check your Downloads folder</small>';
+        document.body.appendChild(successBanner);
+        
+        // Remove banner after 5 seconds
+        setTimeout(() => {
+            successBanner.style.transition = 'opacity 0.5s';
+            successBanner.style.opacity = '0';
+            setTimeout(() => successBanner.remove(), 500);
+        }, 5000);
     }
 </script>
 ```
