@@ -6888,20 +6888,40 @@ const EMBEDDED_PT_DATA = [
 
             console.log('Starting phase-based assignment...');
 
-            // **PHASE 0: Mark first 3 earliest domestic flights as "Overnight Serviced"**
-            const veryEarlyDomestic = flights
-                .filter(f => f.type === 'Domestic' && f.timeMinutes < 420)
-                .slice(0, 3);
+            // **PHASE 0: OVERNIGHT Team - Terminators + 2x 05:00 Departures**
+            // OVERNIGHT works 23:00-05:00: Strip terminators, then load 2x 05:00 departures only
+            const overnight0500 = flights
+                .filter(f => f.type === 'Domestic' && f.timeMinutes === 300)  // Only 05:00 flights
+                .slice(0, 2);  // Only 2 flights
             
-            console.log(`Phase 0 - Overnight Serviced: ${veryEarlyDomestic.length} flights`);
-            veryEarlyDomestic.forEach(flight => {
+            console.log(`Phase 0 - OVERNIGHT: ${overnight0500.length} departures (05:00 only)`);
+            console.log(`  NOTE: OVERNIGHT also strips terminators 23:00-05:00 before departure loads`);
+            overnight0500.forEach(flight => {
                 assignments.push({
                     flight: flight,
                     team: 'OVERNIGHT',
                     phase: 'overnight_serviced'
                 });
-                console.log(` ${flight.flight} (${flight.time})  OVERNIGHT`);
+                console.log(`  ✓ ${flight.flight} (${flight.time}) → OVERNIGHT`);
             });
+            
+            const veryEarlyDomestic = overnight0500;  // For backward compatibility
+
+            // **PHASE 0.5: Very Early Departures (05:30-07:00) - Prioritize TM200/TM201**
+            // TM200 (03:00) and TM201 (04:00) should handle flights right after OVERNIGHT
+            const veryEarlyFlights = flights.filter(f =>
+                f.type === 'Domestic' &&
+                f.timeMinutes > 300 && f.timeMinutes < 420 &&  // After 05:00, before 07:00
+                !assignments.some(a => a.flight === f)
+            );
+            
+            // Get earliest FT teams (TM200, TM201, TM202, etc.)
+            const earlyFTTeams = teams
+                .filter(t => t.type === 'FT' && t.startMinutes < 360)  // Start before 06:00
+                .sort((a, b) => a.startMinutes - b.startMinutes);
+            
+            console.log(`Phase 0.5 - Very Early Domestic (TM200/TM201 priority): ${veryEarlyFlights.length} flights`);
+            assignFlightsFlexible(veryEarlyFlights, earlyFTTeams, assignments, unassigned, teamWorkload, 'very_early_domestic');
 
             // **PHASE 1: Early domestic flights (before 07:00) - PRIORITIZE COVERAGE**
             const earlyDomestic = flights.filter(f => 
@@ -6976,7 +6996,7 @@ const EMBEDDED_PT_DATA = [
                 assignments,
                 unassigned,
                 teamWorkload: Object.values(teamWorkload),
-                stats: calculateStats(assignments, unassigned, teams),
+                stats: calculateStats(assignments, unassigned, Object.values(teamWorkload)),
                 overnightCount: veryEarlyDomestic.length,
                 dayOfWeek: dayOfWeek,
                 coverageGaps: unassignedByTime
@@ -6985,6 +7005,12 @@ const EMBEDDED_PT_DATA = [
 
         function extractTeams(ftData, ptData, dayOfWeek) {
             const teams = [];
+            
+            // FIREHOUSE STANDBY TEAMS - Reserved for IROPS (not assigned in automated schedule)
+            // Option 2: Morning + Evening coverage (12 hours total)
+            const FIREHOUSE_TEAMS = ['TM100', 'TM106'];  // Morning: TM100 (05:00-11:00), Evening: TM106 (15:00-21:00)
+            
+            console.log('🚒 FIREHOUSE Standby Teams Reserved:', FIREHOUSE_TEAMS.join(', '));
             
             // Column names for Thursday
             const shiftCol = 'Thursday';
@@ -7024,6 +7050,13 @@ const EMBEDDED_PT_DATA = [
                 const team = agent[teamCol];
 
                 if (shift && shift !== 'Off' && shift !== '' && dept && dept.includes('TRK') && team) {
+                    
+                    // Skip FIREHOUSE standby teams - reserved for IROPS duty
+                    if (FIREHOUSE_TEAMS.includes(team)) {
+                        console.log(`  🚒 Reserving ${team} for FIREHOUSE standby duty (${shift})`);
+                        return;  // Don't add to scheduled teams
+                    }
+                    
                     // Parse shift start time (format: "0500-1330" or "1300-2130")
                     const startTime = shift.split('-')[0];
                     const startMinutes = timeToMinutes(startTime);
@@ -7071,6 +7104,16 @@ const EMBEDDED_PT_DATA = [
                         timeStr = parts[parts.length - 1];
                     }
                     
+                    // Parse arrival time if exists
+                    let arrTimeStr = '';
+                    if (f.Arr_ETA) {
+                        arrTimeStr = f.Arr_ETA;
+                        if (arrTimeStr.includes(' ')) {
+                            const parts = arrTimeStr.split(' ');
+                            arrTimeStr = parts[parts.length - 1];
+                        }
+                    }
+                    
                     const timeMinutes = timeToMinutes(timeStr);
                     
                     return {
@@ -7082,8 +7125,16 @@ const EMBEDDED_PT_DATA = [
                         type: f.Dep_Type || 'Domestic',
                         gate: f.Dep_Gate || f.Arr_Gate || 'TBD',
                         passengers: parseInt(f.Dep_Total_Customers) || parseInt(f.Arr_Total_Customers) || 0,
-                        turnType: f.TurnType,
                         equipment: f.Dep_Equip || f.Arr_Equip,
+                        turnType: f.TurnType,
+                        // Full arrival information
+                        noseNumber: f['Nose #'] || '',
+                        arrFlight: f.Arr_Flight || '',
+                        arrOrigin: f.Arr_Origin || '',
+                        arrTime: arrTimeStr,
+                        arrGate: f.Arr_Gate || '',
+                        arrEquipment: f.Arr_Equip || '',
+                        arrPassengers: parseInt(f.Arr_Total_Customers) || '',
                         arrivalFlight: f.Arr_Flight || '',
                         arrivalTime: f.Arr_ETA || ''
                     };
@@ -7338,9 +7389,12 @@ const EMBEDDED_PT_DATA = [
             return true;
         }
 
-        function calculateStats(assignments, unassigned, teams) {
+        function calculateStats(assignments, unassigned, teamWorkload) {
             const domestic = assignments.filter(a => a.flight.type === 'Domestic').length;
             const international = assignments.filter(a => a.flight.type === 'International').length;
+
+            // Count only teams that actually have assignments
+            const teamsWithWork = teamWorkload.filter(tw => tw.count > 0).length;
 
             return {
                 totalFlights: assignments.length + unassigned.length,
@@ -7348,7 +7402,7 @@ const EMBEDDED_PT_DATA = [
                 unassigned: unassigned.length,
                 domestic: domestic,
                 international: international,
-                teamsDeployed: teams.length,
+                teamsDeployed: teamsWithWork,
                 coveragePercent: Math.round((assignments.length / (assignments.length + unassigned.length)) * 100)
             };
         }
@@ -8068,9 +8122,20 @@ const EMBEDDED_PT_DATA = [
                 ['International Flights', scheduleResult.stats.international],
                 [''],
                 ['Team Utilization'],
-                ['Teams Deployed', scheduleResult.stats.teamsDeployed],
+                ['Scheduled Teams', scheduleResult.stats.teamsDeployed],
+                ['FIREHOUSE Standby Teams', 2],
+                ['Total Teams Deployed', scheduleResult.stats.teamsDeployed + 2],
                 ['Average Ops per Team', (scheduleResult.stats.assigned / scheduleResult.stats.teamsDeployed).toFixed(2)],
-                ['Overnight Operations', scheduleResult.overnightCount || 0]
+                ['Overnight Operations', scheduleResult.overnightCount || 0],
+                [''],
+                ['Early Morning Details'],
+                ['OVERNIGHT (23:00-05:00)', 'Terminators + 2x 05:00 departures'],
+                ['TM200 (03:00 start)', 'Very early departures (05:51-07:00)'],
+                ['TM201 (04:00 start)', 'Early departures (06:48 onward)'],
+                [''],
+                ['FIREHOUSE Standby'],
+                ['Morning (TM100)', '05:00-11:00 Peak'],
+                ['Evening (TM106)', '15:00-21:00 Peak']
             ];
             const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
             XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
@@ -8103,10 +8168,33 @@ const EMBEDDED_PT_DATA = [
                 });
             }
             
+            // Add FIREHOUSE standby teams to Team Summary (at the end)
+            teamSummaryData.push({
+                'Team': 'TM100 🚒',
+                'Department': 'U00 TRK',
+                'Shift': '05:00-11:00',
+                'Team Type': 'PT - FIREHOUSE',
+                'Operations': 'STANDBY',
+                'First Flight': 'IROPS Coverage',
+                'Last Flight': 'Morning Peak',
+                'Span (hours)': '06:00-10:00'
+            });
+            
+            teamSummaryData.push({
+                'Team': 'TM106 🚒',
+                'Department': 'U30 TRK',
+                'Shift': '15:00-21:00',
+                'Team Type': 'PT - FIREHOUSE',
+                'Operations': 'STANDBY',
+                'First Flight': 'IROPS Coverage',
+                'Last Flight': 'Evening Peak',
+                'Span (hours)': '18:00-22:00'
+            });
+            
             const teamSummarySheet = XLSX.utils.json_to_sheet(teamSummaryData);
             XLSX.utils.book_append_sheet(wb, teamSummarySheet, 'Team Summary');
 
-            // TAB 3: Detailed Team Assignments (one row per flight)
+            // TAB 3: Detailed Team Assignments (one row per flight with arrival info)
             const detailedAssignments = [];
             scheduleResult.teamWorkload.forEach(tw => {
                 tw.operations.forEach((op, idx) => {
@@ -8114,14 +8202,23 @@ const EMBEDDED_PT_DATA = [
                         'Team': tw.team.id,
                         'Shift': tw.team.shift,
                         'Sequence': idx + 1,
-                        'Flight': op.flight,
-                        'Destination': op.destination,
-                        'Time': op.time,
-                        'Type': op.type,
-                        'Gate': op.gate,
-                        'Passengers': op.passengers || '',
-                        'Equipment': op.equipment || '',
-                        'Turn Type': op.turnType || ''
+                        'Nose #': op.noseNumber || '',
+                        'Turn Type': op.turnType || 'Overnight',
+                        // Arrival Information
+                        'Arr Flight': op.arrFlight || '',
+                        'Arr Origin': op.arrOrigin || '',
+                        'Arr Time': op.arrTime || '',
+                        'Arr Gate': op.arrGate || '',
+                        'Arr Equipment': op.arrEquipment || '',
+                        'Arr PAX': op.arrPassengers || '',
+                        // Departure Information
+                        'Dep Flight': op.flight,
+                        'Dep Destination': op.destination,
+                        'Dep Time': op.time,
+                        'Dep Gate': op.gate,
+                        'Dep Equipment': op.equipment || '',
+                        'Dep PAX': op.passengers || '',
+                        'Dep Type': op.type
                     });
                 });
             });
@@ -8132,14 +8229,23 @@ const EMBEDDED_PT_DATA = [
                     'Team': 'OVERNIGHT',
                     'Shift': 'Previous Day',
                     'Sequence': idx + 1,
-                    'Flight': a.flight.flight,
-                    'Destination': a.flight.destination,
-                    'Time': a.flight.time,
-                    'Type': a.flight.type,
-                    'Gate': a.flight.gate,
-                    'Passengers': a.flight.passengers || '',
-                    'Equipment': a.flight.equipment || '',
-                    'Turn Type': a.flight.turnType || ''
+                    'Nose #': a.flight.noseNumber || '',
+                    'Turn Type': a.flight.turnType || 'Overnight',
+                    // Arrival Information (overnight = no arrival)
+                    'Arr Flight': '',
+                    'Arr Origin': '',
+                    'Arr Time': '',
+                    'Arr Gate': '',
+                    'Arr Equipment': '',
+                    'Arr PAX': '',
+                    // Departure Information
+                    'Dep Flight': a.flight.flight,
+                    'Dep Destination': a.flight.destination,
+                    'Dep Time': a.flight.time,
+                    'Dep Gate': a.flight.gate,
+                    'Dep Equipment': a.flight.equipment || '',
+                    'Dep PAX': a.flight.passengers || '',
+                    'Dep Type': a.flight.type
                 });
             });
             
