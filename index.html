@@ -10254,7 +10254,6 @@ const EMBEDDED_PT_DATA = [
             const minBuffer = buffers.length > 0 ? Math.min(...buffers) : 'N/A';
             
             const flightRows = flights.map((flight, idx) => {
-                const buffer = idx > 0 ? `${flights[idx].timeMinutes - flights[idx-1].timeMinutes} min` : '-';
                 return `
                     <tr>
                         <td>${idx + 1}</td>
@@ -10267,7 +10266,6 @@ const EMBEDDED_PT_DATA = [
                         <td>${flight.equipment || 'N/A'}</td>
                         <td>${flight.noseNumber || 'N/A'}</td>
                         <td>${flight.arrTime || 'N/A'}</td>
-                        <td>${buffer}</td>
                     </tr>
                 `;
             }).join('');
@@ -10319,7 +10317,6 @@ const EMBEDDED_PT_DATA = [
                                 <th>Equipment</th>
                                 <th>Tail #</th>
                                 <th>STA</th>
-                                <th>Buffer</th>
                             </tr>
                         </thead>
                         <tbody>
