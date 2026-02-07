@@ -9685,7 +9685,7 @@ const EMBEDDED_PT_DATA = [
             
             html += '<table>';
             html += '<thead><tr>';
-            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th>';
+            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>STA</th>';
             html += '</tr></thead><tbody>';
             
             teamData.operations.forEach((flight, index) => {
@@ -9699,6 +9699,8 @@ const EMBEDDED_PT_DATA = [
                 html += `<td>${flight.gate || '-'}</td>`;
                 html += `<td>${flight.passengers || '-'}</td>`;
                 html += `<td>${flight.equipment || '-'}</td>`;
+                html += `<td>${flight.noseNumber || '-'}</td>`;
+                html += `<td>${flight.arrTime || '-'}</td>`;
                 html += '</tr>';
             });
             
@@ -9718,7 +9720,7 @@ const EMBEDDED_PT_DATA = [
             
             html += '<table>';
             html += '<thead><tr>';
-            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th>';
+            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>STA</th>';
             html += '</tr></thead><tbody>';
             
             flights.forEach((assignment, index) => {
@@ -9733,6 +9735,8 @@ const EMBEDDED_PT_DATA = [
                 html += `<td>${flight.gate || '-'}</td>`;
                 html += `<td>${flight.passengers || '-'}</td>`;
                 html += `<td>${flight.equipment || '-'}</td>`;
+                html += `<td>${flight.noseNumber || '-'}</td>`;
+                html += `<td>${flight.arrTime || '-'}</td>`;
                 html += '</tr>';
             });
             
