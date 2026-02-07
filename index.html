@@ -1377,7 +1377,7 @@
                 <div class="upload-box" id="departuresBox">
                     <h3>📤 Departures CSV</h3>
                     <p>Upload scheduled departures list</p>
-                    <button class="upload-button" type="button" onclick="document.getElementById('departuresFile').click();">Choose File</button>
+                    <button class="upload-button" id="chooseDeparturesBtn" data-file-input="departuresFile" type="button">Choose File</button>
                     <input type="file" id="departuresFile" accept=".csv" onchange="handleFileUpload(this, 'departures');">
                     <div id="departuresFileName"></div>
                 </div>
@@ -1385,7 +1385,7 @@
                 <div class="upload-box" id="arrivalsBox">
                     <h3>📥 Arrivals CSV</h3>
                     <p>Upload scheduled arrivals list</p>
-                    <button class="upload-button" type="button" onclick="document.getElementById('arrivalsFile').click();">Choose File</button>
+                    <button class="upload-button" id="chooseArrivalsBtn" data-file-input="arrivalsFile" type="button">Choose File</button>
                     <input type="file" id="arrivalsFile" accept=".csv" onchange="handleFileUpload(this, 'arrivals');">
                     <div id="arrivalsFileName"></div>
                 </div>
@@ -1940,6 +1940,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('scheduleDate')) {
         document.getElementById('scheduleDate').value = today;
     }
+
+    // Robust file-picker wiring (prevents brittle inline click behavior)
+    document.querySelectorAll('[data-file-input]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const inputId = btn.getAttribute('data-file-input');
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    });
 });
 
 // Handle file upload
@@ -2005,9 +2016,6 @@ function processFlightData() {
                 let nose = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
                 if (/^\d+$/.test(nose)) nose = String(parseInt(nose, 10));
                 if (nose) addToMultiMap(departuresByNose, nose, dep);
-            const nose = dep['Nose #'];
-            if (nose && nose.trim()) {
-                addToMultiMap(departuresByNose, nose.trim(), dep);
             }
         });
 
@@ -2018,9 +2026,6 @@ function processFlightData() {
                 let nose = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
                 if (/^\d+$/.test(nose)) nose = String(parseInt(nose, 10));
                 if (nose) addToMultiMap(arrivalsByNose, nose, arr);
-            const nose = arr['Nose #'];
-            if (nose && nose.trim()) {
-                addToMultiMap(arrivalsByNose, nose.trim(), arr);
             }
         });
 
@@ -2032,16 +2037,12 @@ function processFlightData() {
             const sortedArrivals = [...arrivalList].sort((a, b) => {
                 const ta = toTimeMinutes(getIncomingArrivalETA(a) || a.Arr_Scheduled || '');
                 const tb = toTimeMinutes(getIncomingArrivalETA(b) || b.Arr_Scheduled || '');
-                const ta = toTimeMinutes(a.Arr_ETA || a.Arr_Scheduled || '');
-                const tb = toTimeMinutes(b.Arr_ETA || b.Arr_Scheduled || '');
                 return (ta ?? Number.MAX_SAFE_INTEGER) - (tb ?? Number.MAX_SAFE_INTEGER);
             });
 
             const depQueue = [...(departuresByNose.get(nose) || [])].sort((a, b) => {
                 const ta = toTimeMinutes(a.Scheduled || a.Dep_Scheduled || '');
                 const tb = toTimeMinutes(b.Scheduled || b.Dep_Scheduled || '');
-                const ta = toTimeMinutes(a.Dep_Scheduled || '');
-                const tb = toTimeMinutes(b.Dep_Scheduled || '');
                 return (ta ?? Number.MAX_SAFE_INTEGER) - (tb ?? Number.MAX_SAFE_INTEGER);
             });
 
@@ -2049,9 +2050,6 @@ function processFlightData() {
                 const arrTime = toTimeMinutes(getIncomingArrivalETA(arrival) || arrival.Arr_Scheduled || '');
                 const depIdx = depQueue.findIndex(dep => {
                     const depTime = toTimeMinutes(dep.Scheduled || dep.Dep_Scheduled || '');
-                const arrTime = toTimeMinutes(arrival.Arr_ETA || arrival.Arr_Scheduled || '');
-                const depIdx = depQueue.findIndex(dep => {
-                    const depTime = toTimeMinutes(dep.Dep_Scheduled || '');
                     return depTime !== null && arrTime !== null && depTime >= arrTime;
                 });
 
@@ -9723,7 +9721,6 @@ const EMBEDDED_PT_DATA = [
             html += '<table>';
             html += '<thead><tr>';
             html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>ETA</th>';
-            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>STA</th>';
             html += '</tr></thead><tbody>';
             
             teamData.operations.forEach((flight, index) => {
@@ -9759,7 +9756,6 @@ const EMBEDDED_PT_DATA = [
             html += '<table>';
             html += '<thead><tr>';
             html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>ETA</th>';
-            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>STA</th>';
             html += '</tr></thead><tbody>';
             
             flights.forEach((assignment, index) => {
@@ -10356,7 +10352,6 @@ const EMBEDDED_PT_DATA = [
                                 <th>Equipment</th>
                                 <th>Tail #</th>
                                 <th>ETA</th>
-                                <th>STA</th>
                             </tr>
                         </thead>
                         <tbody>
