@@ -1933,6 +1933,7 @@ function addToMultiMap(map, key, value) {
     map.get(key).push(value);
 }
 
+
 // Initialize date selector with today's date
 document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
@@ -1999,6 +2000,11 @@ function processFlightData() {
 
         // Parse departures
         departuresData.forEach(dep => {
+            const rawNose = dep['Nose #'];
+            if (rawNose) {
+                let nose = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (/^\d+$/.test(nose)) nose = String(parseInt(nose, 10));
+                if (nose) addToMultiMap(departuresByNose, nose, dep);
             const nose = dep['Nose #'];
             if (nose && nose.trim()) {
                 addToMultiMap(departuresByNose, nose.trim(), dep);
@@ -2007,6 +2013,11 @@ function processFlightData() {
 
         // Parse arrivals
         arrivalsData.forEach(arr => {
+            const rawNose = arr['Nose #'];
+            if (rawNose) {
+                let nose = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (/^\d+$/.test(nose)) nose = String(parseInt(nose, 10));
+                if (nose) addToMultiMap(arrivalsByNose, nose, arr);
             const nose = arr['Nose #'];
             if (nose && nose.trim()) {
                 addToMultiMap(arrivalsByNose, nose.trim(), arr);
@@ -2019,18 +2030,25 @@ function processFlightData() {
         // First pass: Create turns and terminators per nose using time-ordered queues
         arrivalsByNose.forEach((arrivalList, nose) => {
             const sortedArrivals = [...arrivalList].sort((a, b) => {
+                const ta = toTimeMinutes(getIncomingArrivalETA(a) || a.Arr_Scheduled || '');
+                const tb = toTimeMinutes(getIncomingArrivalETA(b) || b.Arr_Scheduled || '');
                 const ta = toTimeMinutes(a.Arr_ETA || a.Arr_Scheduled || '');
                 const tb = toTimeMinutes(b.Arr_ETA || b.Arr_Scheduled || '');
                 return (ta ?? Number.MAX_SAFE_INTEGER) - (tb ?? Number.MAX_SAFE_INTEGER);
             });
 
             const depQueue = [...(departuresByNose.get(nose) || [])].sort((a, b) => {
+                const ta = toTimeMinutes(a.Scheduled || a.Dep_Scheduled || '');
+                const tb = toTimeMinutes(b.Scheduled || b.Dep_Scheduled || '');
                 const ta = toTimeMinutes(a.Dep_Scheduled || '');
                 const tb = toTimeMinutes(b.Dep_Scheduled || '');
                 return (ta ?? Number.MAX_SAFE_INTEGER) - (tb ?? Number.MAX_SAFE_INTEGER);
             });
 
             sortedArrivals.forEach(arrival => {
+                const arrTime = toTimeMinutes(getIncomingArrivalETA(arrival) || arrival.Arr_Scheduled || '');
+                const depIdx = depQueue.findIndex(dep => {
+                    const depTime = toTimeMinutes(dep.Scheduled || dep.Dep_Scheduled || '');
                 const arrTime = toTimeMinutes(arrival.Arr_ETA || arrival.Arr_Scheduled || '');
                 const depIdx = depQueue.findIndex(dep => {
                     const depTime = toTimeMinutes(dep.Dep_Scheduled || '');
@@ -9101,12 +9119,14 @@ const EMBEDDED_PT_DATA = [
                     
                     // Parse arrival time if exists
                     let arrTimeStr = '';
-                    if (f.Arr_ETA) {
-                        arrTimeStr = f.Arr_ETA;
+                    const arrivalTimeSource = f.Arr_ETA || f.STA || f.Arr_Scheduled || '';
+                    if (arrivalTimeSource) {
+                        arrTimeStr = arrivalTimeSource;
                         if (arrTimeStr.includes(' ')) {
                             const parts = arrTimeStr.split(' ');
                             arrTimeStr = parts[parts.length - 1];
                         }
+                        arrTimeStr = normalizeTimeString(arrTimeStr);
                     }
                     
                     const timeMinutes = timeToMinutes(timeStr);
