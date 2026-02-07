@@ -2307,47 +2307,82 @@ function downloadMatchedExcel() {
         'Dep_Scheduled', 'GroundTime_Minutes', 'Team', '__PowerAppsId__'
     ];
 
-    // Create worksheet data
-    const wsData = [columns];
-    matchedScheduleData.forEach(row => {
-        const rowData = columns.map(col => row[col] || '');
-        wsData.push(rowData);
-    });
-
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    // Create worksheet from JSON (better for tables than aoa_to_sheet)
+    const ws = XLSX.utils.json_to_sheet(matchedScheduleData, { header: columns });
     
     // Set column widths
     ws['!cols'] = columns.map(() => ({ wch: 15 }));
     
-    // Calculate the range for the table
-    const range = XLSX.utils.encode_range({
-        s: { c: 0, r: 0 },
-        e: { c: columns.length - 1, r: matchedScheduleData.length }
-    });
-    ws['!ref'] = range;
+    // Define the table range (includes header row)
+    const lastRow = matchedScheduleData.length;
+    const lastCol = columns.length - 1;
+    const tableRef = `A1:${XLSX.utils.encode_col(lastCol)}${lastRow + 1}`;
     
-    // Add as Excel Table with name "Table1" for PowerApps
-    ws['!tables'] = [{
-        name: 'Table1',
-        ref: range,
-        headerRow: true,
-        totalsRow: false,
-        style: {
-            theme: 'TableStyleMedium2',
-            showRowStripes: true
-        }
-    }];
+    // Create workbook
+    const wb = XLSX.utils.book_new();
     
-    // Append sheet with name "Table1" for PowerApps compatibility
+    // Set workbook properties for Excel table
+    wb.Workbook = wb.Workbook || {};
+    wb.Workbook.Views = [{RTL: false}];
+    
+    // Add the worksheet with the name "Table1"
     XLSX.utils.book_append_sheet(wb, ws, 'Table1');
+    
+    // Add table definition to the worksheet
+    // This creates a proper Excel Table that PowerApps will recognize
+    if (!ws['!ref']) ws['!ref'] = tableRef;
+    ws['!autofilter'] = { ref: tableRef };
+    
+    // Mark this as a table for Excel
+    const tableName = 'Table1';
+    ws['!tables'] = ws['!tables'] || [];
+    ws['!tables'].push({
+        ref: tableRef,
+        name: tableName,
+        displayName: tableName,
+        headerRowCount: 1,
+        totalsRowCount: 0,
+        tableStyleInfo: {
+            name: 'TableStyleMedium2',
+            showFirstColumn: false,
+            showLastColumn: false,
+            showRowStripes: true,
+            showColumnStripes: false
+        }
+    });
 
-    // Download file
+    // Generate Excel file as blob instead of auto-downloading
+    const wbout = XLSX.write(wb, { 
+        bookType: 'xlsx', 
+        type: 'array',
+        bookSST: false,
+        cellStyles: true
+    });
+    
+    // Create blob
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+    // Create download link with save dialog
     const filename = `Matched_Schedule_${selectedDate.replace(/-/g, '')}_with_Teams.xlsx`;
-    XLSX.writeFile(wb, filename);
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.href = url;
+    link.download = filename; // This triggers browser's save dialog
+    link.style.display = 'none';
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    
+    // Cleanup
+    setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, 100);
 
-    showStatus(`✓ Excel file downloaded: ${filename} (formatted as Table1 for PowerApps)`, 'success');
+    showStatus(`✓ Save dialog opened for: ${filename}`, 'success');
+    console.log('Excel file prepared with Table1 format for PowerApps');
 }
 
 // Populate Team assignments from scheduler results into matched schedule
@@ -10809,13 +10844,41 @@ const EMBEDDED_PT_DATA = [
             console.log('User Agent:', navigator.userAgent.substring(0, 50));
             
             try {
-                XLSX.writeFile(wb, filename);
+                // Generate Excel file as blob instead of auto-downloading
+                const wbout = XLSX.write(wb, { 
+                    bookType: 'xlsx', 
+                    type: 'array',
+                    bookSST: false
+                });
+                
+                // Create blob
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                
+                // Create download link with save dialog
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.href = url;
+                link.download = filename; // This triggers browser's save dialog
+                link.style.display = 'none';
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
                 console.log('========== EXPORT COMPLETED ==========');
-                console.log('File exported successfully:', filename);
+                console.log('Save dialog opened for:', filename);
             } catch (error) {
                 console.error('========== EXPORT FAILED ==========');
                 console.error('Error:', error);
                 console.error('Export failed:', error.message);
+                alert('Export failed: ' + error.message);
             }
         }
 
