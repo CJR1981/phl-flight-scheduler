@@ -2145,6 +2145,12 @@ function processFlightData() {
     }
 }
 
+
+function getIncomingArrivalETA(arrival) {
+    const rawEta = arrival.ETA || arrival.Eta || arrival['ETA'] || arrival['Arr ETA'] || arrival['Arrival ETA'] || arrival.Scheduled || '';
+    return normalizeTimeString(rawEta);
+}
+
 // Create a turn record (arrival + departure)
 function createTurnRecord(arrival, departure, scheduleDate) {
     const arrTime = parseTime(arrival.Scheduled);
@@ -2170,7 +2176,7 @@ function createTurnRecord(arrival, departure, scheduleDate) {
         Arr_Carrier: arrival.Carrier || '',
         Arr_Flight: arrival.Flight || '',
         Arr_Origin: arrival.Origin || '',
-        Arr_ETA: formatTime(arrival.Scheduled),
+        Arr_ETA: formatTime(getIncomingArrivalETA(arrival)),
         Arr_Flight_Status: arrival['Flight Status'] || '',
         Arr_Equip: arrival['Equip.'] || '',
         Arr_Dest: arrival['Dest.'] || '',
@@ -2179,7 +2185,7 @@ function createTurnRecord(arrival, departure, scheduleDate) {
         Arr_Total_Customers: arrival['Total Customers'] || '0',
         Arr_Connecting_Passengers: arrival['Connecting Passengers'] || '0',
         ArrDate: scheduleDate,
-        STA: formatTimeOfDay(arrival.Scheduled),
+        STA: formatTimeOfDay(getIncomingArrivalETA(arrival)),
         Arr_Type: arrival.Type || '',
         Dep_Right_Start: departure['Right Start'] || '',
         Arr_Scheduled: arrival.Scheduled || '',
@@ -2250,7 +2256,7 @@ function createTerminatorRecord(flight, scheduleDate, type) {
         record.Arr_Carrier = flight.Carrier || '';
         record.Arr_Flight = flight.Flight || '';
         record.Arr_Origin = flight.Origin || '';
-        record.Arr_ETA = formatTime(flight.Scheduled);
+        record.Arr_ETA = formatTime(getIncomingArrivalETA(flight));
         record.Arr_Flight_Status = flight['Flight Status'] || '';
         record.Arr_Equip = flight['Equip.'] || '';
         record.Arr_Dest = flight['Dest.'] || '';
@@ -2258,7 +2264,7 @@ function createTerminatorRecord(flight, scheduleDate, type) {
         record.Arr_Gate = flight.Gate || '';
         record.Arr_Total_Customers = flight['Total Customers'] || '0';
         record.Arr_Connecting_Passengers = flight['Connecting Passengers'] || '0';
-        record.STA = formatTimeOfDay(flight.Scheduled);
+        record.STA = formatTimeOfDay(getIncomingArrivalETA(flight));
         record.Arr_Type = flight.Type || '';
         record.Arr_Scheduled = flight.Scheduled || '';
     } else {
@@ -2282,6 +2288,14 @@ function createTerminatorRecord(flight, scheduleDate, type) {
     return record;
 }
 
+// Normalize a time-like value to HH:MM for downstream usage
+function normalizeTimeString(rawTime) {
+    if (!rawTime) return '';
+    const mins = timeToMinutes(String(rawTime));
+    if (isNaN(mins) || mins < 0) return '';
+    return minutesToTime(mins);
+}
+
 // Parse time string (HH:MM format)
 function parseTime(timeStr) {
     if (!timeStr) return null;
@@ -2295,23 +2309,26 @@ function parseTime(timeStr) {
 
 // Format time for display (1/0/1900 HH:MM format for PowerApp compatibility)
 function formatTime(timeStr) {
-    if (!timeStr) return '';
-    return `1/0/1900 ${timeStr}`;
+    const normalized = normalizeTimeString(timeStr);
+    if (!normalized) return '';
+    return `1/0/1900 ${normalized}`;
 }
 
 // Format time of day (HH:MM:SS AM/PM format)
 function formatTimeOfDay(timeStr) {
-    if (!timeStr) return '';
-    const parts = timeStr.split(':');
+    const normalized = normalizeTimeString(timeStr);
+    if (!normalized) return '';
+
+    const parts = normalized.split(':');
     if (parts.length !== 2) return '';
-    
+
     let hours = parseInt(parts[0]);
     const minutes = parts[1];
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    
+
     hours = hours % 12;
     if (hours === 0) hours = 12;
-    
+
     return `${hours}:${minutes}:00 ${ampm}`;
 }
 
@@ -9685,6 +9702,7 @@ const EMBEDDED_PT_DATA = [
             
             html += '<table>';
             html += '<thead><tr>';
+            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>ETA</th>';
             html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>STA</th>';
             html += '</tr></thead><tbody>';
             
@@ -9720,6 +9738,7 @@ const EMBEDDED_PT_DATA = [
             
             html += '<table>';
             html += '<thead><tr>';
+            html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>ETA</th>';
             html += '<th>#</th><th>Flight</th><th>Destination</th><th>STD</th><th>Type</th><th>Gate</th><th>PAX</th><th>Equipment</th><th>Tail #</th><th>STA</th>';
             html += '</tr></thead><tbody>';
             
@@ -10316,6 +10335,7 @@ const EMBEDDED_PT_DATA = [
                                 <th>PAX</th>
                                 <th>Equipment</th>
                                 <th>Tail #</th>
+                                <th>ETA</th>
                                 <th>STA</th>
                             </tr>
                         </thead>
