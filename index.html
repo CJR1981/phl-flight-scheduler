@@ -2323,7 +2323,6 @@ function downloadMatchedExcel() {
     ws['!cols'] = columns.map(() => ({ wch: 15 }));
     
     // Add worksheet to workbook with name "Table1"
-    // PowerApps will recognize this sheet name
     XLSX.utils.book_append_sheet(wb, ws, 'Table1');
     
     // Set workbook properties
@@ -2350,14 +2349,42 @@ function downloadMatchedExcel() {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
     });
     
-    // Use FileSaver.js for reliable save dialog
-    if (typeof saveAs !== 'undefined') {
-        console.log('Using FileSaver.js saveAs()');
-        saveAs(blob, filename);
-        showStatus(`✓ Save dialog opened: ${filename}`, 'success');
+    // Try modern File System Access API first (Chrome 86+, Edge 86+)
+    if ('showSaveFilePicker' in window) {
+        // Modern API - shows real save dialog
+        console.log('Using File System Access API (modern save dialog)');
+        
+        window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{
+                description: 'Excel Files',
+                accept: {
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+                }
+            }]
+        }).then(fileHandle => {
+            return fileHandle.createWritable();
+        }).then(writable => {
+            writable.write(blob);
+            return writable;
+        }).then(writable => {
+            writable.close();
+            showStatus(`✓ File saved successfully!`, 'success');
+            console.log('File saved via File System Access API');
+        }).catch(err => {
+            if (err.name !== 'AbortError') {
+                console.error('Save error:', err);
+                showStatus('Save cancelled or error occurred', 'error');
+            } else {
+                console.log('User cancelled save dialog');
+            }
+        });
     } else {
-        // Fallback if FileSaver.js didn't load
-        console.log('FileSaver.js not available, using fallback');
+        // Fallback for older browsers
+        console.log('File System Access API not available, using fallback');
+        console.log('Note: Browser will auto-download to Downloads folder');
+        
+        // Create download link
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -2365,15 +2392,53 @@ function downloadMatchedExcel() {
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
+        
+        // Cleanup
         setTimeout(() => {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
         }, 100);
-        showStatus(`✓ File download started: ${filename}`, 'success');
+        
+        showStatus(`✓ File downloading to your Downloads folder: ${filename}`, 'info');
+        console.log('File downloaded via legacy method');
     }
     
     console.log('Excel file created successfully');
     console.log(`Sheet: Table1, Rows: ${matchedScheduleData.length}, Columns: ${columns.length}`);
+    
+    // Show instructions for table format
+    setTimeout(() => {
+        if (!document.getElementById('tableFormatHint')) {
+            const hint = document.createElement('div');
+            hint.id = 'tableFormatHint';
+            hint.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000;';
+            hint.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                    <strong style="color: #856404; font-size: 1.1em;">📋 PowerApps Import Tip</strong>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 1.5em; cursor: pointer; color: #856404;">&times;</button>
+                </div>
+                <div style="color: #856404; font-size: 0.9em; line-height: 1.5;">
+                    <p style="margin: 0 0 10px 0;"><strong>For PowerApps to recognize the file:</strong></p>
+                    <ol style="margin: 0; padding-left: 20px;">
+                        <li>Open the file in Excel</li>
+                        <li>Click any data cell</li>
+                        <li>Press <strong>Ctrl+T</strong></li>
+                        <li>Click OK</li>
+                        <li>Save and import to PowerApps</li>
+                    </ol>
+                    <p style="margin: 10px 0 0 0; font-size: 0.85em; font-style: italic;">This creates the Table1 format PowerApps needs.</p>
+                </div>
+            `;
+            document.body.appendChild(hint);
+            
+            // Auto-remove after 15 seconds
+            setTimeout(() => {
+                if (hint.parentElement) {
+                    hint.remove();
+                }
+            }, 15000);
+        }
+    }, 1000);
 }
 
 // Populate Team assignments from scheduler results into matched schedule
@@ -10845,15 +10910,42 @@ const EMBEDDED_PT_DATA = [
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
                 });
                 
-                // Use FileSaver.js for reliable save dialog
-                if (typeof saveAs !== 'undefined') {
-                    console.log('Using FileSaver.js saveAs()');
-                    saveAs(blob, filename);
-                    console.log('========== EXPORT COMPLETED ==========');
-                    console.log('Save dialog opened for:', filename);
+                // Try modern File System Access API first (Chrome 86+, Edge 86+)
+                if ('showSaveFilePicker' in window) {
+                    // Modern API - shows real save dialog
+                    console.log('Using File System Access API (modern save dialog)');
+                    
+                    window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: 'Excel Files',
+                            accept: {
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+                            }
+                        }]
+                    }).then(fileHandle => {
+                        return fileHandle.createWritable();
+                    }).then(writable => {
+                        writable.write(blob);
+                        return writable;
+                    }).then(writable => {
+                        writable.close();
+                        console.log('========== EXPORT COMPLETED ==========');
+                        console.log('File saved successfully via File System Access API');
+                    }).catch(err => {
+                        if (err.name !== 'AbortError') {
+                            console.error('Save error:', err);
+                            alert('Save error: ' + err.message);
+                        } else {
+                            console.log('User cancelled save dialog');
+                        }
+                    });
                 } else {
-                    // Fallback if FileSaver.js didn't load
-                    console.log('FileSaver.js not available, using fallback');
+                    // Fallback for older browsers
+                    console.log('File System Access API not available, using fallback');
+                    console.log('Note: Browser will auto-download to Downloads folder');
+                    
+                    // Create download link
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
@@ -10861,12 +10953,15 @@ const EMBEDDED_PT_DATA = [
                     link.style.display = 'none';
                     document.body.appendChild(link);
                     link.click();
+                    
+                    // Cleanup
                     setTimeout(() => {
                         document.body.removeChild(link);
                         URL.revokeObjectURL(url);
                     }, 100);
+                    
                     console.log('========== EXPORT COMPLETED ==========');
-                    console.log('File download started:', filename);
+                    console.log('File downloaded to Downloads folder');
                 }
             } catch (error) {
                 console.error('========== EXPORT FAILED ==========');
