@@ -10261,6 +10261,8 @@ const EMBEDDED_PT_DATA = [
                         <td>${flight.gate}</td>
                         <td>${flight.passengers || 'N/A'}</td>
                         <td>${flight.equipment || 'N/A'}</td>
+                        <td>${flight.noseNumber || 'N/A'}</td>
+                        <td>${flight.arrTime || 'N/A'}</td>
                         <td>${buffer}</td>
                     </tr>
                 `;
@@ -10311,6 +10313,8 @@ const EMBEDDED_PT_DATA = [
                                 <th>Gate</th>
                                 <th>PAX</th>
                                 <th>Equipment</th>
+                                <th>Tail #</th>
+                                <th>STA</th>
                                 <th>Buffer</th>
                             </tr>
                         </thead>
