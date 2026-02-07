@@ -11433,8 +11433,7 @@ const EMBEDDED_PT_DATA = [
                 assignment.flight.time = newETD;
                 
                 // Recalculate timeMinutes
-                const timeParts = newETD.split(':');
-                assignment.flight.timeMinutes = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+                assignment.flight.timeMinutes = timeToMinutes(newETD);
                 
                 // Track modification
                 if (!liveUpdateState.modifications.flights[flightNumber]) {
@@ -11458,127 +11457,145 @@ const EMBEDDED_PT_DATA = [
             return false;
         }
 
-        function analyzeTimingConflicts(flight, newETD, teamData) {
-            const conflicts = [];
-            const newETDMinutes = parseInt(newETD.split(':')[0]) * 60 + parseInt(newETD.split(':')[1]);
-            const originalETDMinutes = flight.timeMinutes;
-            
-            console.log(`=== Analyzing conflicts for ${flight.flight} with new ETD ${newETD} ===`);
-            console.log(`Original time: ${flight.time}, New time: ${newETD}`);
-            console.log(`Team ${teamData.team.id} has ${teamData.operations.length} operations`);
-            
-            // CRITICAL CONCEPT: Flights are PRE-LOADED on truck before leaving facility
-            // We only need to check if gate-to-gate timing still works with the delay
-            
-            teamData.operations.forEach(assignedFlight => {
-                if (assignedFlight.flight === flight.flight) return; // Skip self
-                
-                const otherTimeMinutes = assignedFlight.timeMinutes;
-                const otherTime = assignedFlight.time;
-                
-                console.log(`\n  Checking ${assignedFlight.flight} at ${otherTime}:`);
-                
-                // Calculate ORIGINAL gap in the schedule
-                const originalGap = Math.abs(otherTimeMinutes - originalETDMinutes);
-                
-                // Calculate NEW gap with the delay
-                const newGap = Math.abs(otherTimeMinutes - newETDMinutes);
-                
-                console.log(`    Original gap: ${originalGap} min`);
-                console.log(`    New gap after delay: ${newGap} min`);
-                
-                // LOGIC: If original schedule had X minutes between flights, and that worked,
-                // then as long as we still have some reasonable time (e.g., 5+ min for gate-to-gate),
-                // the delay is acceptable
-                
-                const minimumGateToGate = 5; // Minimum time to drive between gates
-                
-                // Determine which flight is first
-                const delayedFlightIsFirst = newETDMinutes < otherTimeMinutes;
-                
-                if (delayedFlightIsFirst) {
-                    // Delayed flight departs BEFORE the other flight
-                    const gapBetween = otherTimeMinutes - newETDMinutes;
-                    
-                    console.log(`    Delayed flight is FIRST &rarr; ${gapBetween} min until next flight`);
-                    
-                    if (gapBetween < minimumGateToGate) {
-                        console.log(`    WARNING: Only ${gapBetween} min gap (need ${minimumGateToGate} min minimum for gate-to-gate)`);
-                        conflicts.push({
-                            flight: assignedFlight.flight,
-                            time: otherTime,
-                            gap: gapBetween,
-                            required: minimumGateToGate,
-                            reason: `Insufficient time for truck to travel gate-to-gate`
-                        });
-                    } else {
-                        console.log(`    OK: ${gapBetween} min is enough for gate-to-gate travel`);
-                    }
-                } else {
-                    // Other flight departs BEFORE the delayed flight
-                    const gapBetween = newETDMinutes - otherTimeMinutes;
-                    
-                    console.log(`    Delayed flight is AFTER &rarr; ${gapBetween} min after previous flight`);
-                    
-                    if (gapBetween < minimumGateToGate) {
-                        console.log(`    WARNING: Only ${gapBetween} min gap (need ${minimumGateToGate} min minimum for gate-to-gate)`);
-                        conflicts.push({
-                            flight: assignedFlight.flight,
-                            time: otherTime,
-                            gap: gapBetween,
-                            required: minimumGateToGate,
-                            reason: `Insufficient time for truck to travel gate-to-gate from previous flight`
-                        });
-                    } else {
-                        console.log(`    OK: ${gapBetween} min is enough for gate-to-gate travel`);
-                    }
+
+        function evaluateTeamFitForLiveUpdate(teamData, targetFlight, newETD, options = {}) {
+            const conflictDetails = [];
+            const excludeFlightNumber = options.excludeFlightNumber || targetFlight.flight;
+            const updatedDepartureMinutes = timeToMinutes(newETD);
+
+            if (!updatedDepartureMinutes || updatedDepartureMinutes < 0) {
+                conflictDetails.push({
+                    type: 'input',
+                    reason: `Unable to parse ETD "${newETD}"`
+                });
+                return { fits: false, conflicts: conflictDetails };
+            }
+
+            const updatedFlight = {
+                ...targetFlight,
+                time: newETD,
+                timeMinutes: updatedDepartureMinutes
+            };
+
+            const serviceStart = updatedDepartureMinutes - getServiceBufferMinutes(updatedFlight.type);
+            const teamReadyTime = teamData.team.startMinutes + SCHEDULER_CONFIG.teams.prepMinutesStandard;
+            const shiftEnd = teamData.team.startMinutes + (SCHEDULER_CONFIG.teams.shiftHours * 60);
+
+            if (serviceStart < teamReadyTime) {
+                conflictDetails.push({
+                    type: 'availability',
+                    reason: `Service starts at ${minutesToTime(serviceStart)} before ${teamData.team.id} is ready at ${minutesToTime(teamReadyTime)}`,
+                    required: `>= ${minutesToTime(teamReadyTime)}`
+                });
+            }
+
+            // Live update policy: delayed departure must remain inside scheduled shift window
+            if (updatedDepartureMinutes > shiftEnd) {
+                conflictDetails.push({
+                    type: 'availability',
+                    reason: `Departure ${newETD} is beyond ${teamData.team.id} shift end ${minutesToTime(shiftEnd)}`,
+                    required: `<= ${minutesToTime(shiftEnd)}`
+                });
+            }
+
+            const remainingOps = teamData.operations.filter(op => op.flight !== excludeFlightNumber);
+            const projectedOps = remainingOps.length + 1;
+            if (projectedOps > SCHEDULER_CONFIG.teams.workloadLimitStandard) {
+                conflictDetails.push({
+                    type: 'capacity',
+                    reason: `${teamData.team.id} would exceed workload limit (${projectedOps}/${SCHEDULER_CONFIG.teams.workloadLimitStandard})`
+                });
+            }
+
+            remainingOps.forEach(op => {
+                const departureGap = Math.abs(updatedFlight.timeMinutes - op.timeMinutes);
+                const updatedServiceStart = updatedFlight.timeMinutes - getServiceBufferMinutes(updatedFlight.type);
+                const existingServiceStart = op.timeMinutes - getServiceBufferMinutes(op.type);
+                const serviceGap = Math.abs(updatedServiceStart - existingServiceStart);
+
+                if (departureGap < SCHEDULER_CONFIG.spacing.standardMinGap || serviceGap < SCHEDULER_CONFIG.spacing.standardMinGap) {
+                    conflictDetails.push({
+                        type: 'buffer',
+                        flight: op.flight,
+                        time: op.time,
+                        gap: Math.min(departureGap, serviceGap),
+                        required: SCHEDULER_CONFIG.spacing.standardMinGap,
+                        reason: `Minimum separation ${SCHEDULER_CONFIG.spacing.standardMinGap} min not met`
+                    });
+                }
+
+                if ((updatedFlight.type === 'International' || updatedFlight.type === 'Precleared') && op.type === 'Domestic' && departureGap < SCHEDULER_CONFIG.spacing.standardIntlAfterDomesticGap) {
+                    conflictDetails.push({
+                        type: 'buffer',
+                        flight: op.flight,
+                        time: op.time,
+                        gap: departureGap,
+                        required: SCHEDULER_CONFIG.spacing.standardIntlAfterDomesticGap,
+                        reason: `International after domestic requires ${SCHEDULER_CONFIG.spacing.standardIntlAfterDomesticGap} min`
+                    });
+                }
+
+                if ((updatedFlight.type === 'International' || updatedFlight.type === 'Precleared') && (op.type === 'International' || op.type === 'Precleared') && departureGap < SCHEDULER_CONFIG.spacing.standardIntlAfterIntlGap) {
+                    conflictDetails.push({
+                        type: 'buffer',
+                        flight: op.flight,
+                        time: op.time,
+                        gap: departureGap,
+                        required: SCHEDULER_CONFIG.spacing.standardIntlAfterIntlGap,
+                        reason: `International-to-international requires ${SCHEDULER_CONFIG.spacing.standardIntlAfterIntlGap} min`
+                    });
                 }
             });
-            
-            console.log(`\nFound ${conflicts.length} conflicts`);
-            return conflicts;
+
+            return {
+                fits: conflictDetails.length === 0,
+                conflicts: conflictDetails,
+                projectedOps,
+                serviceStart,
+                teamReadyTime,
+                shiftEnd
+            };
+        }
+
+        function analyzeTimingConflicts(flight, newETD, teamData) {
+            console.log(`=== Analyzing conflicts for ${flight.flight} with new ETD ${newETD} ===`);
+            const evaluation = evaluateTeamFitForLiveUpdate(teamData, flight, newETD);
+            console.log('Live-fit evaluation:', evaluation);
+
+            return evaluation.conflicts.map(conflict => ({
+                flight: conflict.flight || 'SHIFT/CAPACITY',
+                time: conflict.time || '-',
+                gap: conflict.gap ?? '-',
+                required: conflict.required ?? '-',
+                reason: conflict.reason
+            }));
         }
 
         function findAlternativeTeams(flight, newETD) {
             const alternatives = [];
-            const flightTime = new Date(`2000-01-01T${newETD}`);
-            
+
             // Check each team for availability
             scheduleResult.teamWorkload.forEach(teamData => {
                 const currentAssignment = liveUpdateState.selectedFlightData;
                 if (teamData.team.id === currentAssignment.team) return; // Skip current team
-                
-                let canFit = true;
-                let minGap = 999;
-                
-                // Check if this team has capacity
-                if (teamData.operations.length >= 6) {
-                    canFit = false;
-                } else {
-                    // Check timing conflicts with this team's flights
-                    teamData.operations.forEach(assignedFlight => {
-                        const otherTime = new Date(`2000-01-01T${assignedFlight.time}`);  // Changed from assignedFlight.std
-                        const timeDiffMins = Math.abs(flightTime - otherTime) / 60000;
-                        minGap = Math.min(minGap, timeDiffMins);
-                        
-                        if (timeDiffMins < 40) {
-                            canFit = false;
-                        }
-                    });
-                }
-                
-                if (canFit) {
+
+                const evaluation = evaluateTeamFitForLiveUpdate(teamData, flight, newETD, {
+                    excludeFlightNumber: null
+                });
+
+                if (evaluation.fits) {
                     alternatives.push({
                         team: teamData.team.id,
                         currentOps: teamData.operations.length,
-                        minGap: minGap === 999 ? 'N/A' : minGap
+                        minGap: 'N/A',
+                        projectedOps: evaluation.projectedOps
                     });
                 }
             });
-            
+
             // Sort by current ops (prefer less loaded teams)
             alternatives.sort((a, b) => a.currentOps - b.currentOps);
-            
+
             console.log(`Found ${alternatives.length} alternative teams`);
             return alternatives.slice(0, 3); // Top 3 alternatives
         }
