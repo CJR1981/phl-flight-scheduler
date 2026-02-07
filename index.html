@@ -67,6 +67,7 @@
     - Character encoding fixes
     -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         * {
@@ -2296,6 +2297,8 @@ function downloadMatchedExcel() {
         populateTeamAssignments();
     }
 
+    console.log('Creating Excel file for PowerApps...');
+
     // Define column order to match PowerApp expectations
     const columns = [
         'TurnType', 'Nose #', 'Arr_Carrier', 'Arr_Flight', 'Arr_Origin', 'Arr_ETA',
@@ -2307,82 +2310,70 @@ function downloadMatchedExcel() {
         'Dep_Scheduled', 'GroundTime_Minutes', 'Team', '__PowerAppsId__'
     ];
 
-    // Create worksheet from JSON (better for tables than aoa_to_sheet)
-    const ws = XLSX.utils.json_to_sheet(matchedScheduleData, { header: columns });
-    
-    // Set column widths
-    ws['!cols'] = columns.map(() => ({ wch: 15 }));
-    
-    // Define the table range (includes header row)
-    const lastRow = matchedScheduleData.length;
-    const lastCol = columns.length - 1;
-    const tableRef = `A1:${XLSX.utils.encode_col(lastCol)}${lastRow + 1}`;
-    
     // Create workbook
     const wb = XLSX.utils.book_new();
     
-    // Set workbook properties for Excel table
-    wb.Workbook = wb.Workbook || {};
-    wb.Workbook.Views = [{RTL: false}];
+    // Create worksheet from JSON with proper column order
+    const ws = XLSX.utils.json_to_sheet(matchedScheduleData, { 
+        header: columns,
+        skipHeader: false 
+    });
     
-    // Add the worksheet with the name "Table1"
+    // Set column widths for readability
+    ws['!cols'] = columns.map(() => ({ wch: 15 }));
+    
+    // Add worksheet to workbook with name "Table1"
+    // PowerApps will recognize this sheet name
     XLSX.utils.book_append_sheet(wb, ws, 'Table1');
     
-    // Add table definition to the worksheet
-    // This creates a proper Excel Table that PowerApps will recognize
-    if (!ws['!ref']) ws['!ref'] = tableRef;
-    ws['!autofilter'] = { ref: tableRef };
-    
-    // Mark this as a table for Excel
-    const tableName = 'Table1';
-    ws['!tables'] = ws['!tables'] || [];
-    ws['!tables'].push({
-        ref: tableRef,
-        name: tableName,
-        displayName: tableName,
-        headerRowCount: 1,
-        totalsRowCount: 0,
-        tableStyleInfo: {
-            name: 'TableStyleMedium2',
-            showFirstColumn: false,
-            showLastColumn: false,
-            showRowStripes: true,
-            showColumnStripes: false
-        }
-    });
+    // Set workbook properties
+    wb.Props = {
+        Title: "PHL Matched Schedule",
+        Subject: "Flight Schedule with Team Assignments",
+        Author: "PHL Scheduler",
+        CreatedDate: new Date()
+    };
 
-    // Generate Excel file as blob instead of auto-downloading
+    // Generate filename
+    const filename = `Matched_Schedule_${selectedDate.replace(/-/g, '')}_with_Teams.xlsx`;
+    
+    // Write workbook to array buffer
     const wbout = XLSX.write(wb, { 
         bookType: 'xlsx', 
         type: 'array',
-        bookSST: false,
-        cellStyles: true
+        cellStyles: true,
+        bookSST: false
     });
     
     // Create blob
-    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const blob = new Blob([wbout], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
     
-    // Create download link with save dialog
-    const filename = `Matched_Schedule_${selectedDate.replace(/-/g, '')}_with_Teams.xlsx`;
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
+    // Use FileSaver.js for reliable save dialog
+    if (typeof saveAs !== 'undefined') {
+        console.log('Using FileSaver.js saveAs()');
+        saveAs(blob, filename);
+        showStatus(`✓ Save dialog opened: ${filename}`, 'success');
+    } else {
+        // Fallback if FileSaver.js didn't load
+        console.log('FileSaver.js not available, using fallback');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 100);
+        showStatus(`✓ File download started: ${filename}`, 'success');
+    }
     
-    link.href = url;
-    link.download = filename; // This triggers browser's save dialog
-    link.style.display = 'none';
-    
-    // Trigger download
-    document.body.appendChild(link);
-    link.click();
-    
-    // Cleanup
-    setTimeout(() => {
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }, 100);
-
-    showStatus(`✓ Save dialog opened for: ${filename}`, 'success');
-    console.log('Excel file prepared with Table1 format for PowerApps');
+    console.log('Excel file created successfully');
+    console.log(`Sheet: Table1, Rows: ${matchedScheduleData.length}, Columns: ${columns.length}`);
 }
 
 // Populate Team assignments from scheduler results into matched schedule
@@ -10840,11 +10831,9 @@ const EMBEDDED_PT_DATA = [
             
             console.log('[OK] All tabs created successfully');
             console.log('Attempting to save file:', filename);
-            console.log('Platform:', navigator.platform);
-            console.log('User Agent:', navigator.userAgent.substring(0, 50));
             
             try {
-                // Generate Excel file as blob instead of auto-downloading
+                // Write workbook to array buffer
                 const wbout = XLSX.write(wb, { 
                     bookType: 'xlsx', 
                     type: 'array',
@@ -10852,28 +10841,33 @@ const EMBEDDED_PT_DATA = [
                 });
                 
                 // Create blob
-                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blob = new Blob([wbout], { 
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                });
                 
-                // Create download link with save dialog
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                
-                link.href = url;
-                link.download = filename; // This triggers browser's save dialog
-                link.style.display = 'none';
-                
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                
-                // Cleanup
-                setTimeout(() => {
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                
-                console.log('========== EXPORT COMPLETED ==========');
-                console.log('Save dialog opened for:', filename);
+                // Use FileSaver.js for reliable save dialog
+                if (typeof saveAs !== 'undefined') {
+                    console.log('Using FileSaver.js saveAs()');
+                    saveAs(blob, filename);
+                    console.log('========== EXPORT COMPLETED ==========');
+                    console.log('Save dialog opened for:', filename);
+                } else {
+                    // Fallback if FileSaver.js didn't load
+                    console.log('FileSaver.js not available, using fallback');
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    console.log('========== EXPORT COMPLETED ==========');
+                    console.log('File download started:', filename);
+                }
             } catch (error) {
                 console.error('========== EXPORT FAILED ==========');
                 console.error('Error:', error);
