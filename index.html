@@ -1934,17 +1934,6 @@ function addToMultiMap(map, key, value) {
 }
 
 
-function normalizeNoseKey(rawNose) {
-    if (!rawNose) return '';
-    let key = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-    // If purely numeric, normalize leading zeros so 0987 and 987 match
-    if (/^\d+$/.test(key)) {
-        key = String(parseInt(key, 10));
-    }
-    return key;
-}
-
-
 // Initialize date selector with today's date
 document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
@@ -2011,17 +2000,21 @@ function processFlightData() {
 
         // Parse departures
         departuresData.forEach(dep => {
-            const nose = normalizeNoseKey(dep['Nose #']);
-            if (nose) {
-                addToMultiMap(departuresByNose, nose, dep);
+            const rawNose = dep['Nose #'];
+            if (rawNose) {
+                let nose = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (/^\d+$/.test(nose)) nose = String(parseInt(nose, 10));
+                if (nose) addToMultiMap(departuresByNose, nose, dep);
             }
         });
 
         // Parse arrivals
         arrivalsData.forEach(arr => {
-            const nose = normalizeNoseKey(arr['Nose #']);
-            if (nose) {
-                addToMultiMap(arrivalsByNose, nose, arr);
+            const rawNose = arr['Nose #'];
+            if (rawNose) {
+                let nose = String(rawNose).trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (/^\d+$/.test(nose)) nose = String(parseInt(nose, 10));
+                if (nose) addToMultiMap(arrivalsByNose, nose, arr);
             }
         });
 
