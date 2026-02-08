@@ -2393,9 +2393,25 @@ function downloadMatchedExcel() {
     
     // Set column widths for readability
     ws['!cols'] = columns.map(() => ({ wch: 15 }));
-    
-    // Add worksheet to workbook with name "Table1"
-    XLSX.utils.book_append_sheet(wb, ws, 'Table1');
+
+    // Add autofilter so Excel treats header row as filterable table-like range
+    const lastCol = XLSX.utils.encode_col(columns.length - 1);
+    const lastRow = matchedScheduleData.length + 1; // header row + data rows
+    ws['!autofilter'] = { ref: `A1:${lastCol}${lastRow}` };
+
+    // Add worksheet with stable sheet name
+    const sheetName = 'MatchedSchedule';
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    // Add named range "Table1" covering the full exported data range
+    // (PowerApps/Excel integrations often look for this identifier)
+    wb.Workbook = wb.Workbook || {};
+    wb.Workbook.Names = wb.Workbook.Names || [];
+    wb.Workbook.Names = wb.Workbook.Names.filter(n => n.Name !== 'Table1');
+    wb.Workbook.Names.push({
+        Name: 'Table1',
+        Ref: `'${sheetName}'!$A$1:$${lastCol}$${lastRow}`
+    });
     
     // Set workbook properties
     wb.Props = {
@@ -2476,7 +2492,7 @@ function downloadMatchedExcel() {
     }
     
     console.log('Excel file created successfully');
-    console.log(`Sheet: Table1, Rows: ${matchedScheduleData.length}, Columns: ${columns.length}`);
+    console.log(`Sheet: MatchedSchedule, Named Range: Table1, Rows: ${matchedScheduleData.length}, Columns: ${columns.length}`);
     
     // Show instructions for table format
     setTimeout(() => {
