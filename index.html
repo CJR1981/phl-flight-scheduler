@@ -1915,6 +1915,9 @@ const SCHEDULER_CONFIG = {
         flexibleMinGap: 5,
         flexibleIntlGap: 10,
         veryFlexibleMinGap: 3
+    },
+    balancing: {
+        targetMaxDifference: 1
     }
 };
 
@@ -9034,7 +9037,8 @@ const EMBEDDED_PT_DATA = [
                 teamWorkload[team.id] = {
                     team: team,
                     operations: [],
-                    count: 0
+                    count: 0,
+                    totalServiceMinutes: 0
                 };
             });
 
@@ -9127,6 +9131,11 @@ const EMBEDDED_PT_DATA = [
             if (stillUnassigned.length > 0) {
                 console.log(`Phase 6 - Final Sweep: ${stillUnassigned.length} flights remaining`);
                 assignFlightsVeryFlexible(stillUnassigned, teams, assignments, unassigned, teamWorkload, 'final_sweep');
+            }
+
+            const rebalancedMoves = rebalanceAssignments(assignments, teamWorkload, teams);
+            if (rebalancedMoves > 0) {
+                console.log(`Rebalancing complete: moved ${rebalancedMoves} flight(s) for better workload distribution`);
             }
 
             console.log(`=== Schedule Complete ===`);
@@ -9315,22 +9324,11 @@ const EMBEDDED_PT_DATA = [
             
             flights.forEach((flight, index) => {
                 let assigned = false;
-                let bestTeam = null;
-                let minWorkload = Infinity;
                 let rejectionReasons = [];
 
-                // Find best available team (with least workload)
                 for (let team of teams) {
                     const workload = teamWorkload[team.id];
-                    
-                    // Check if team can handle this flight
-                    if (canAssignFlight(team, flight, workload)) {
-                        if (workload.count < minWorkload) {
-                            minWorkload = workload.count;
-                            bestTeam = team;
-                        }
-                    } else {
-                        // Track why we couldn't assign
+                    if (!canAssignFlight(team, flight, workload)) {
                         const serviceStart = flight.timeMinutes - getServiceBufferMinutes(flight.type);
                         const teamReady = team.startMinutes + SCHEDULER_CONFIG.teams.prepMinutesStandard;
                         if (serviceStart < teamReady) {
@@ -9341,6 +9339,8 @@ const EMBEDDED_PT_DATA = [
                     }
                 }
 
+                const bestTeam = selectBestTeamForFlight(teams, teamWorkload, flight, canAssignFlight, 'standard');
+
                 if (bestTeam) {
                     const workload = teamWorkload[bestTeam.id];
                     assignments.push({
@@ -9350,9 +9350,10 @@ const EMBEDDED_PT_DATA = [
                     });
                     workload.operations.push(flight);
                     workload.count++;
+                    workload.totalServiceMinutes += estimateServiceMinutes(flight);
                     assigned = true;
                     
-                    if (index < 3) { // Log first few assignments
+                    if (index < 3) {
                         console.log(` ${flight.flight} (${flight.time})  ${bestTeam.id}`);
                     }
                 } else {
@@ -9361,32 +9362,20 @@ const EMBEDDED_PT_DATA = [
                         reason: 'No available team matching timing and operational constraints'
                     });
                     
-                    if (index < 3) { // Log first few failures
+                    if (index < 3) {
                         console.log(` ${flight.flight} (${flight.time}) - ${rejectionReasons.slice(0, 2).join(', ')}`);
                     }
                 }
             });
             
-            console.log(`Phase complete: ${flights.filter((f, i) => assignments.some(a => a.flight === f)).length} assigned, ${flights.filter((f, i) => unassigned.some(u => u.flight === f)).length} unassigned`);
+            console.log(`Phase complete: ${flights.filter((f) => assignments.some(a => a.flight === f)).length} assigned, ${flights.filter((f) => unassigned.some(u => u.flight === f)).length} unassigned`);
         }
         
         // More flexible assignment - reduces time gaps and increases workload limits
         function assignFlightsFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
-            flights.forEach((flight, index) => {
+            flights.forEach((flight) => {
                 let assigned = false;
-                let bestTeam = null;
-                let minWorkload = Infinity;
-
-                for (let team of teams) {
-                    const workload = teamWorkload[team.id];
-                    
-                    if (canAssignFlightFlexible(team, flight, workload)) {
-                        if (workload.count < minWorkload) {
-                            minWorkload = workload.count;
-                            bestTeam = team;
-                        }
-                    }
-                }
+                const bestTeam = selectBestTeamForFlight(teams, teamWorkload, flight, canAssignFlightFlexible, 'flexible');
 
                 if (bestTeam) {
                     const workload = teamWorkload[bestTeam.id];
@@ -9397,6 +9386,7 @@ const EMBEDDED_PT_DATA = [
                     });
                     workload.operations.push(flight);
                     workload.count++;
+                    workload.totalServiceMinutes += estimateServiceMinutes(flight);
                     assigned = true;
                 } else {
                     // Don't add to unassigned yet - let other phases try
@@ -9406,21 +9396,9 @@ const EMBEDDED_PT_DATA = [
         
         // Very flexible assignment for final sweep - maximum coverage
         function assignFlightsVeryFlexible(flights, teams, assignments, unassigned, teamWorkload, phase) {
-            flights.forEach((flight, index) => {
+            flights.forEach((flight) => {
                 let assigned = false;
-                let bestTeam = null;
-                let minWorkload = Infinity;
-
-                for (let team of teams) {
-                    const workload = teamWorkload[team.id];
-                    
-                    if (canAssignFlightVeryFlexible(team, flight, workload)) {
-                        if (workload.count < minWorkload) {
-                            minWorkload = workload.count;
-                            bestTeam = team;
-                        }
-                    }
-                }
+                const bestTeam = selectBestTeamForFlight(teams, teamWorkload, flight, canAssignFlightVeryFlexible, 'veryFlexible');
 
                 if (bestTeam) {
                     const workload = teamWorkload[bestTeam.id];
@@ -9431,6 +9409,7 @@ const EMBEDDED_PT_DATA = [
                     });
                     workload.operations.push(flight);
                     workload.count++;
+                    workload.totalServiceMinutes += estimateServiceMinutes(flight);
                     assigned = true;
                     console.log(` Final sweep: ${flight.flight} (${flight.time})  ${bestTeam.id}`);
                 } else {
@@ -9474,6 +9453,116 @@ const EMBEDDED_PT_DATA = [
             }
 
             return false;
+        }
+
+        function selectBestTeamForFlight(teams, teamWorkload, flight, canAssignFn, mode) {
+            const candidates = teams
+                .map(team => ({ team, workload: teamWorkload[team.id] }))
+                .filter(({ team, workload }) => canAssignFn(team, flight, workload));
+
+            if (candidates.length === 0) return null;
+
+            const counts = candidates.map(c => c.workload.count);
+            const serviceLoads = candidates.map(c => c.workload.totalServiceMinutes || 0);
+            const minCount = Math.min(...counts);
+            const maxCount = Math.max(...counts);
+            const minService = Math.min(...serviceLoads);
+            const maxService = Math.max(...serviceLoads);
+
+            const serviceStartTime = flight.timeMinutes - getServiceBufferMinutes(flight.type);
+            const prepMinutes = mode === 'standard' ? SCHEDULER_CONFIG.teams.prepMinutesStandard : SCHEDULER_CONFIG.teams.prepMinutesFlexible;
+
+            let bestCandidate = null;
+            let bestScore = -Infinity;
+
+            for (const candidate of candidates) {
+                const { team, workload } = candidate;
+                const countSpread = Math.max(1, maxCount - minCount);
+                const serviceSpread = Math.max(1, maxService - minService);
+
+                const countBalanceScore = (maxCount - workload.count) / countSpread;
+                const serviceBalanceScore = (maxService - (workload.totalServiceMinutes || 0)) / serviceSpread;
+
+                const teamReadyTime = team.startMinutes + prepMinutes;
+                const startFitPenalty = Math.abs(serviceStartTime - teamReadyTime);
+                const startFitScore = 1 - Math.min(1, startFitPenalty / 360);
+
+                const score = (countBalanceScore * 0.6) + (serviceBalanceScore * 0.25) + (startFitScore * 0.15);
+
+                if (score > bestScore || (Math.abs(score - bestScore) < 0.001 && (!bestCandidate || team.id < bestCandidate.team.id))) {
+                    bestScore = score;
+                    bestCandidate = candidate;
+                }
+            }
+
+            return bestCandidate ? bestCandidate.team : null;
+        }
+
+        function rebalanceAssignments(assignments, teamWorkload, teams) {
+            const teamById = {};
+            teams.forEach(team => {
+                teamById[team.id] = team;
+            });
+
+            let moves = 0;
+            const maxIterations = 500;
+
+            for (let i = 0; i < maxIterations; i++) {
+                const workloadList = Object.values(teamWorkload);
+                if (workloadList.length === 0) break;
+
+                const maxCount = Math.max(...workloadList.map(w => w.count));
+                const minCount = Math.min(...workloadList.map(w => w.count));
+                if (maxCount - minCount <= SCHEDULER_CONFIG.balancing.targetMaxDifference) break;
+
+                const sourceTeams = workloadList
+                    .filter(w => w.count === maxCount)
+                    .sort((a, b) => (b.totalServiceMinutes || 0) - (a.totalServiceMinutes || 0));
+                const targetTeams = workloadList
+                    .filter(w => w.count === minCount)
+                    .sort((a, b) => (a.totalServiceMinutes || 0) - (b.totalServiceMinutes || 0));
+
+                let movedThisIteration = false;
+
+                for (const sourceWorkload of sourceTeams) {
+                    const sourceAssignments = assignments
+                        .filter(a => a.team === sourceWorkload.team.id)
+                        .sort((a, b) => b.flight.timeMinutes - a.flight.timeMinutes);
+
+                    for (const assignment of sourceAssignments) {
+                        for (const targetWorkload of targetTeams) {
+                            if (targetWorkload.team.id === sourceWorkload.team.id) continue;
+                            const targetTeam = teamById[targetWorkload.team.id];
+                            if (!targetTeam) continue;
+
+                            if (!canAssignFlightFlexible(targetTeam, assignment.flight, targetWorkload)) continue;
+
+                            const sourceOpIndex = sourceWorkload.operations.indexOf(assignment.flight);
+                            if (sourceOpIndex >= 0) sourceWorkload.operations.splice(sourceOpIndex, 1);
+                            sourceWorkload.count = Math.max(0, sourceWorkload.count - 1);
+                            sourceWorkload.totalServiceMinutes = Math.max(0, (sourceWorkload.totalServiceMinutes || 0) - estimateServiceMinutes(assignment.flight));
+
+                            targetWorkload.operations.push(assignment.flight);
+                            targetWorkload.count++;
+                            targetWorkload.totalServiceMinutes = (targetWorkload.totalServiceMinutes || 0) + estimateServiceMinutes(assignment.flight);
+
+                            assignment.team = targetWorkload.team.id;
+                            assignment.phase = `${assignment.phase}_rebalanced`;
+                            moves++;
+                            movedThisIteration = true;
+                            break;
+                        }
+
+                        if (movedThisIteration) break;
+                    }
+
+                    if (movedThisIteration) break;
+                }
+
+                if (!movedThisIteration) break;
+            }
+
+            return moves;
         }
 
         function canAssignFlightFlexible(team, flight, workload) {
