@@ -1898,6 +1898,15 @@ const SCHEDULER_CONFIG = {
         workloadLimitStandard: 8,
         workloadLimitFlexible: 10,
         workloadLimitVeryFlexible: 12,
+        maxFirstAssignmentDelayStandard: 120,
+        maxFirstAssignmentDelayFlexible: 150,
+        maxFirstAssignmentDelayVeryFlexible: 180,
+        minWrapUpMinutesStandard: 20,
+        minWrapUpMinutesFlexible: 10,
+        minWrapUpMinutesVeryFlexible: 5,
+        maxDepartureAfterShiftEndStandard: 20,
+        maxDepartureAfterShiftEndFlexible: 30,
+        maxDepartureAfterShiftEndVeryFlexible: 45,
         firehouseReservedTeams: ['TM100', 'TM106']
     },
     flights: {
@@ -9486,7 +9495,18 @@ const EMBEDDED_PT_DATA = [
                 const startFitPenalty = Math.abs(serviceStartTime - teamReadyTime);
                 const startFitScore = 1 - Math.min(1, startFitPenalty / 360);
 
-                const score = (countBalanceScore * 0.6) + (serviceBalanceScore * 0.25) + (startFitScore * 0.15);
+                let firstAssignmentScore = 0.5;
+                if (workload.count === 0) {
+                    const firstDelay = serviceStartTime - teamReadyTime;
+                    const firstLimit = mode === 'veryFlexible'
+                        ? SCHEDULER_CONFIG.teams.maxFirstAssignmentDelayVeryFlexible
+                        : mode === 'flexible'
+                        ? SCHEDULER_CONFIG.teams.maxFirstAssignmentDelayFlexible
+                        : SCHEDULER_CONFIG.teams.maxFirstAssignmentDelayStandard;
+                    firstAssignmentScore = 1 - Math.min(1, Math.max(0, firstDelay) / Math.max(1, firstLimit));
+                }
+
+                const score = (countBalanceScore * 0.5) + (serviceBalanceScore * 0.2) + (startFitScore * 0.15) + (firstAssignmentScore * 0.15);
 
                 if (score > bestScore || (Math.abs(score - bestScore) < 0.001 && (!bestCandidate || team.id < bestCandidate.team.id))) {
                     bestScore = score;
@@ -9564,6 +9584,37 @@ const EMBEDDED_PT_DATA = [
             return moves;
         }
 
+
+        function violatesShiftAnchoring(team, flight, workload, mode, teamReadyTime, shiftEnd) {
+            const serviceStartTime = flight.timeMinutes - getServiceBufferMinutes(flight.type);
+            const firstDelayLimit = mode === 'veryFlexible'
+                ? SCHEDULER_CONFIG.teams.maxFirstAssignmentDelayVeryFlexible
+                : mode === 'flexible'
+                ? SCHEDULER_CONFIG.teams.maxFirstAssignmentDelayFlexible
+                : SCHEDULER_CONFIG.teams.maxFirstAssignmentDelayStandard;
+
+            if (workload.count === 0) {
+                const firstDelayMinutes = serviceStartTime - teamReadyTime;
+                if (firstDelayMinutes > firstDelayLimit) return true;
+            }
+
+            const wrapUpMinutes = mode === 'veryFlexible'
+                ? SCHEDULER_CONFIG.teams.minWrapUpMinutesVeryFlexible
+                : mode === 'flexible'
+                ? SCHEDULER_CONFIG.teams.minWrapUpMinutesFlexible
+                : SCHEDULER_CONFIG.teams.minWrapUpMinutesStandard;
+            if (serviceStartTime > (shiftEnd - wrapUpMinutes)) return true;
+
+            const departureOverrunLimit = mode === 'veryFlexible'
+                ? SCHEDULER_CONFIG.teams.maxDepartureAfterShiftEndVeryFlexible
+                : mode === 'flexible'
+                ? SCHEDULER_CONFIG.teams.maxDepartureAfterShiftEndFlexible
+                : SCHEDULER_CONFIG.teams.maxDepartureAfterShiftEndStandard;
+            if (flight.timeMinutes > (shiftEnd + departureOverrunLimit)) return true;
+
+            return false;
+        }
+
         function canAssignFlightFlexible(team, flight, workload) {
             // FLEXIBLE MODE - Based on live schedule patterns
             // Live data: 0-5 min gaps common, early starts standard
@@ -9579,6 +9630,8 @@ const EMBEDDED_PT_DATA = [
             const shiftEnd = team.startMinutes + (SCHEDULER_CONFIG.teams.shiftHours * 60);
             const maxTime = shiftEnd + SCHEDULER_CONFIG.teams.overtimeMinutesFlexible;
             if (flight.timeMinutes > maxTime) return false;
+
+            if (violatesShiftAnchoring(team, flight, workload, 'flexible', teamReadyTime, shiftEnd)) return false;
 
             if (workload.count >= SCHEDULER_CONFIG.teams.workloadLimitFlexible) return false;
 
@@ -9603,6 +9656,8 @@ const EMBEDDED_PT_DATA = [
             const maxTime = shiftEnd + SCHEDULER_CONFIG.teams.overtimeMinutesFlexible;
             if (flight.timeMinutes > maxTime) return false;
 
+            if (violatesShiftAnchoring(team, flight, workload, 'veryFlexible', teamReadyTime, shiftEnd)) return false;
+
             if (workload.count >= SCHEDULER_CONFIG.teams.workloadLimitVeryFlexible) return false;
 
             if (hasOperationConflict(workload, flight, 'veryFlexible')) return false;
@@ -9626,6 +9681,10 @@ const EMBEDDED_PT_DATA = [
             const shiftEnd = team.startMinutes + (SCHEDULER_CONFIG.teams.shiftHours * 60); // 8.5 hour shift
             const maxTime = shiftEnd + SCHEDULER_CONFIG.teams.overtimeMinutesStandard;
             if (flight.timeMinutes > maxTime) {
+                return false;
+            }
+
+            if (violatesShiftAnchoring(team, flight, workload, 'standard', teamReadyTime, shiftEnd)) {
                 return false;
             }
 
