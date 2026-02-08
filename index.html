@@ -9436,8 +9436,7 @@ const EMBEDDED_PT_DATA = [
                 const departureGap = Math.abs(flight.timeMinutes - op.timeMinutes);
                 const serviceGap = Math.abs(serviceStartTime - existingServiceStart);
                 const gateTravelMinutes = estimateGateTravelMinutes(op.gate, flight.gate);
-                const serviceMinutes = Math.max(estimateServiceMinutes(op), estimateServiceMinutes(flight));
-                const requiredGap = minGap + gateTravelMinutes + serviceMinutes;
+                const requiredGap = minGap + gateTravelMinutes;
                 if (departureGap < requiredGap || serviceGap < requiredGap) {
                     return true;
                 }
@@ -11715,8 +11714,7 @@ const EMBEDDED_PT_DATA = [
                 const existingServiceStart = op.timeMinutes - getServiceBufferMinutes(op.type);
                 const serviceGap = Math.abs(updatedServiceStart - existingServiceStart);
                 const gateTravelMinutes = estimateGateTravelMinutes(op.gate, updatedFlight.gate);
-                const serviceMinutes = Math.max(estimateServiceMinutes(op), estimateServiceMinutes(updatedFlight));
-                const requiredGap = SCHEDULER_CONFIG.spacing.standardMinGap + gateTravelMinutes + serviceMinutes;
+                const requiredGap = SCHEDULER_CONFIG.spacing.standardMinGap + gateTravelMinutes;
 
                 if (departureGap < requiredGap || serviceGap < requiredGap) {
                     conflictDetails.push({
@@ -11725,7 +11723,7 @@ const EMBEDDED_PT_DATA = [
                         time: op.time,
                         gap: Math.min(departureGap, serviceGap),
                         required: requiredGap,
-                        reason: `Minimum separation ${requiredGap} min not met (includes ${gateTravelMinutes} min gate travel + ${serviceMinutes} min service)`
+                        reason: `Minimum separation ${requiredGap} min not met (includes ${gateTravelMinutes} min gate travel)`
                     });
                 }
 
